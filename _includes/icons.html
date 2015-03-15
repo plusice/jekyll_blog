@@ -1,11 +1,3 @@
-{% if site.theme.rss %}
-<li>
-	<a href="{{ "/feed.xml" | prepend: site.baseurl | prepend: site.url }}" title="{{ site.theme.str_rss_follow }}">
-		<i class="fa fa-fw fa-rss"></i>
-	</a>
-</li>
-{% endif %}
-
 {% if site.theme.email_address %}
 <li>
 	<a href="mailto:{{ site.theme.email_address }}" title="{{ site.theme.str_email }}">
@@ -154,6 +146,14 @@
 <li>
 	<a href="https://www.youtube.com/user/{{ site.theme.youtube }}" title="{{ site.theme.str_follow_on }} YouTube">
 		<i class="fa fa-fw fa-youtube"></i>
+	</a>
+</li>
+{% endif %}
+
+{% if site.theme.rss %}
+<li>
+	<a href="{{ "/feed.xml" | prepend: site.baseurl | prepend: site.url }}" title="{{ site.theme.str_rss_follow }}">
+		<i class="fa fa-fw fa-rss"></i>
 	</a>
 </li>
 {% endif %}
