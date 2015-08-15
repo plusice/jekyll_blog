@@ -47,3 +47,9 @@ header {
     @extend %padding-regular;
   }
 }
+
+code {
+  display: block;
+  padding: 2%;
+  background-color: #ECECEC;
+}

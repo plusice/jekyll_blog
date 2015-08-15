@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html class="no-js">
+
+  <head>
+	<meta charset="utf-8">
+	<title>sass入门使用总结 | plusice</title>
+	<meta name="description" content="      虽然sass出了很久了，但一直没有使用，因为在前公司没有使用编译工具，只有自己使用的话会怕导致不好维护（其实也是懒的借口）。">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-Frame-Options" content="sameorigin">
+	
+	<!-- CSS -->
+	<link rel="stylesheet" href="/css/main.css">
+	
+	<!--Favicon-->
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+	
+	<!-- Canonical -->
+	<link rel="canonical" href="http://blog.plusicec.com/2015/07/29/sass%E5%88%9D%E8%AF%95.html">
+	
+	<!-- RSS -->
+	<link rel="alternate" type="application/atom+xml" title="plusice" href="http://blog.plusicec.com/feed.xml" />
+	
+	<!-- Font Awesome -->
+	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+	
+	<!-- Google Fonts -->
+	<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic" rel="stylesheet" type="text/css">
+	
+  <!-- KaTeX -->
+	
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+	
+
+	<!-- Google Analytics -->
+	
+</head>
+
+
+  <body>
+    <header class="site-header">
+
+	<div class="branding">
+		
+		<a href="/">
+			<img class="avatar" src="/img/avatar.png" alt=""/>
+		</a>
+		
+		
+		<h1 class="site-title">
+			<a href="/">plusice</a>
+		</h1>
+	</div>
+	
+	<nav class="site-nav">
+		<ul>
+			
+				
+			
+				
+				<li>
+					<a class="page-link" href="/about/">About</a>
+				</li>
+				
+			
+				
+			
+				
+			
+				
+			
+
+			<!-- Social icons from Font Awesome, if enabled -->
+			
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+	<a href="https://github.com/plusice" title="Follow on GitHub">
+		<i class="fa fa-fw fa-github"></i>
+	</a>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li>
+	<a href="http://blog.plusicec.com/feed.xml" title="Follow RSS feed">
+		<i class="fa fa-fw fa-rss"></i>
+	</a>
+</li>
+
+		</ul>
+	</nav>
+	
+</header>
+
+
+    <div class="content">
+      <article >
+
+  <header style="background-image: url('/')">
+    <h1 class="title">sass入门使用总结</h1>
+    
+    <p class="meta">
+    July 29, 2015
+    
+    </p>
+  </header>
+
+  <section class="post-content">
+    <p>      虽然sass出了很久了，但一直没有使用，因为在前公司没有使用编译工具，只有自己使用的话会怕导致不好维护（其实也是懒的借口）。</p>
+
+<p>      最近公司的一个小项目，我开始了sass的使用。其实一开始用sass，我也是拒绝的，因为没有使用过，而项目稍微有点紧，怕不熟悉而影响进度。好吧，说来也惭愧，前端入坑已几年，竟然还没有用过这东西，哭！然而！使用之后duangduang的却发现，这玩意上手简直及其简单，可能也是我只是使用了比较简单的功能吧。之前试用过less，感觉还是又挺多东西要记的。话不多扯，下面自我总结一番sass的基本用法：</p>
+
+<h3 id="section">1.嵌套</h3>
+<p>      有两种嵌套，一种是选择器嵌套，一种是属性嵌套</p>
+
+<h4 id="section-1">选择器嵌套：</h4>
+
+<pre><code>.parent {
+    width: 100px;
+    .sub {
+        color: #fff;
+    }
+}
+</code></pre>
+
+<h4 id="section-2">选择器嵌套：</h4>
+
+<pre><code>div {
+    border {
+        style: solid;
+        color: #fff;
+    }
+}
+</code></pre>
+
+<p>      个人觉得选择器嵌套可以少用，因为css选择器层级过多会影响解析速度。类似上面的嵌套，可以直接写一个parent-sub的类名，直接为该类名指定样式。</p>
+
+<h3 id="section-3">2.变量</h3>
+<p>      用$符号，可以将某个值声明为一个变量，例如在一个网站中，可以把主题颜色设置成一个变量，主题需要更换的时候只需更改变量，无需更改所有用到主题颜色的元素。</p>
+
+<pre><code>$theme-color: #0f0;
+</code></pre>
+
+<h3 id="section-4">3.计算</h3>
+<p>      可能某个元素的宽度要依赖于另外一个来计算，就可以用这个功能啦</p>
+
+<pre><code>a {
+     width: 2*2px;
+     height: 2+$var;
+}
+</code></pre>
+
+<h3 id="section-5">4.继承</h3>
+<p>      对于某些有部分类似样式的选择器来说是很有用的。subclass继承了class：</p>
+
+<pre><code>.class {
+     color: #000;
+}
+.subclass {
+     @extend .class;
+     width: 10px;
+}
+</code></pre>
+
+<h3 id="mixin">5.Mixin</h3>
+<p>      类似于函数功能，可以将一段样式封装起来，甚至可以传参数，然后用@include引入。这个相当有用哇，例如可以定义一个按钮，把color，border-radius，width，padding的值都当作参数传入，这样 写的时候只要写Mixin和参数值的引用就行了。而且参数支持缺省值哦，相当于函数的默认参数值。</p>
+
+<pre><code>@mixin test($value:10px) {
+     width: $value;
+     height: 10px;
+}
+div {
+     @include test(20px);
+}
+</code></pre>
+
+<h3 id="compass">6.配合compass使用</h3>
+<p>      compass是使用sass的一个工具，在sass的基础上，封装了一系列有用的模块模板，你也可以使用compass来批量处理sass文件，监听文件更改。使用compass可以让你使用很多预定义好的Mixin，会有助于提高编写效率。例如</p>
+
+<pre><code>div {
+    -webkit-animation: test;
+    -moz-animation: test;
+    animation: test;
+}
+</code></pre>
+
+<p>      引入compass/animation后可以写成</p>
+
+<pre><code>div {
+    @include animation(test);       
+}
+</code></pre>
+
+<h4 id="section-6">好好学习，天天向上，不要惧怕使用新的东西。</h4>
+
+
+  </section>
+  
+</article>
+
+<!-- Disqus -->
+
+    </div>
+
+    <script src="/js/main.js"></script>
+
+
+<footer class="site-footer">
+	<p class="text">Powered by <a href="http://jekyllrb.com">Jekyll</a> with <a href="https://rohanchandra.github.io/project/type/">Type Theme</a>
+</p>
+</footer>
+
+  </body>
+  
+</html>
