@@ -1,0 +1,35 @@
+<p>终于找到时间（不偷懒）来填三个星期前挖的坑了，虽然不是什么干货，但是通过写写文章，也可以增强自己的语言组织能力，这点对程序员后面的发展也是至关重要的。切入正题，这次记录以下我用cors跨域时失败的问题（不涉及cookie跨域）。</p>
+
+<p>前两周和一个后端在集成接口，因为前端代码在我本地，后端接口在他机子上，所以让他设置cors让我可以跨域访问。然而，结果却老是得到一个404请求，查看请求信息发现是发了一个options请求，而本来的请求都没有发出去。我当时就纳闷了，自己之前用nodejs试过后端Access-Control-Allow-Origin就行啦，为何这次就不行。然后试着用原生的ajax请求和jquery请求都可以哇。</p>
+
+<p>google了些许时间后才发现问题，我前端使用angualr写的，其他人的认证模块在请求里插入了自定义的头域，而这是cors请求出现options预请求的其中一种情况，当出现以下一种情况就会发出预请求（其他情况和正常请求一样）：</p>
+
+<ol>
+  <li>请求以 GET, HEAD 或者 POST 以外的方法发起请求。或者，使用 POST，但请求数据为 application/x-www-form-urlencoded, multipart/form-data 或者 text/plain 以外的数据类型。比如说，用 POST 发送数据类型为 application/xml 或者 text/xml 的 XML 数据的请求。</li>
+  <li>
+    <p>使用自定义请求头（比如添加诸如 X-PINGOTHER）</p>
+
+    <p>提示：从Gecko 2.0开始，text/plain, application/x-www-form-urlencoded 和 multipart/form-data 类型的数据都可以直接用于跨站请求，而不需要先发起“预请求”了。之前，只有 text/plain 可以不用先发起“预请求”，进行跨站请求。</p>
+  </li>
+</ol>
+
+<p>找到发起options请求的原因了，那为什么会404呢，原因也是非常简单，后端没处理。。。所以其实一切的一切都不是前端的问题，想允许跨域，后端对原始请求设置Access-Control-Allow-Origin响应头，对其预请求——options请求进行响应，并对options请求添加相关响应头即可：</p>
+
+<pre><code>Access-Control-Allow-Origin: ＊                      // 允许跨域的域名
+Access-Control-Allow-Methods: POST, GET, OPTIONS     // 允许跨域的方法
+Access-Control-Allow-Headers: X-PINGOTHER            // 允许跨域的自定义头域
+</code></pre>
+
+<p>最后附上nginx对options请求的响应处理，因为nginx好像默认不支持options请求，可以这么做（其实用if是不太好的）：</p>
+
+<pre><code>location / {
+		if ($request_method = OPTIONS ) {
+	        add_header 'Access-Control-Allow-Origin' '*';
+			add_header 'Access-Control-Allow-Methods' 'POST, GET, OPTIONS';
+			add_header 'Access-Control-Allow-Headers' 'X-PINGOTHER';
+	        return 200;
+	    }
+	}
+</code></pre>
+
+<p>参考链接：<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS">点击跳转</a></p>
