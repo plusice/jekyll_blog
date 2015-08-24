@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>员工生活</title>
+    <title></title>
     <meta charset='UTF-8' />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <style type="text/css">
@@ -15,6 +15,9 @@
         .lineheight10 {
             line-height: 10px;
         }
+        .lineheight40 {
+            line-height: 40px;
+        }
         span {
             display: inline-block;
         }
@@ -25,6 +28,7 @@
         }
         .inline2 {
             color: #fff;
+            width: 60px;
             height: 20px;
         }
 
@@ -34,7 +38,7 @@
 
 <body>
 
-<p>例1:两个inline-block元素,一个空的一个带文本</p>
+<h4>例1:两个inline-block元素,一个空的一个带文本</h4>
 <div>
     <span class="inline1"></span>
     <span class="inline2 lineheight20">文本</span>
@@ -42,12 +46,26 @@
 <br/>
 
 
-<p>例1:一个空inline-block元素</p>
+<h4>例2:inline-block多行文本</h4>
+<div class="lineheight20">
+    <span class="inline1"></span>
+    <span class="inline2">文本文本文本文本</span>
+</div>
+<br/>
+
+<h4>例2:不包含文本的line box</h4>
+line-height:40px
+<div class="lineheight40">
+    <span class="inline1"></span>
+</div>
+<br/>
+line-height:20px
 <div class="lineheight20">
     <span class="inline1"></span>
 </div>
 <br/>
-<div class="">
+line-height:10px
+<div class="lineheight10">
     <span class="inline1"></span>
 </div>
 
