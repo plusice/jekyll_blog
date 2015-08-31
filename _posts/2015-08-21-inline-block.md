@@ -30,4 +30,4 @@ title: 从inline-block到line-height到vertical-align
 
 ***
 (2015-08-31补充)
-今天发现css大神张鑫旭新写的一篇博客跟我这里内容类似,不过很详细,内容更多(虽然比较啰嗦哈哈):<a href="http://jsfiddle.net/plusice/wg08hfmq/2/" id="eg-link">戳我吧</a>.文中的"基本现象衍生：垂直居中"让我顿悟.
+今天发现css大神张鑫旭新写的一篇博客跟我这里内容类似,不过很详细,内容更多(虽然比较啰嗦哈哈):<a href="http://www.zhangxinxu.com/wordpress/2015/08/css-deep-understand-vertical-align-and-line-height/" id="eg-link">戳我吧</a>.文中的"基本现象衍生：垂直居中"让我顿悟.
