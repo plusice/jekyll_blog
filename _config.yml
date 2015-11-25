@@ -1,3 +1,6 @@
+gems :
+  - jekyll-paginate
+
 # SITE CONFIGURATION
 baseurl:  # the subpath of your site, e.g. /blog/
 url: "http://blog.plusicec.com" # the base hostname & protocol for your site
@@ -9,40 +12,40 @@ theme:
   avatar: avatar.png
   gravatar: # Email MD5 hash
   description: "A website with blog posts and pages" # used by search engines
-  
+
   # Header and footer text
   header_text: >
      <p> plusice,Code and Life</p>
   footer_text: >
    Powered by <a href="http://jekyllrb.com">Jekyll</a> with <a href="https://rohanchandra.github.io/project/type/">Type Theme</a>
-  
+
   # Icons
   rss: true
   email_address: # Full email address, e.g. "sam@example.com"
   behance:
-  bitbucket: 
-  dribbble: 
-  facebook: 
-  flickr: 
+  bitbucket:
+  dribbble:
+  facebook:
+  flickr:
   github: "plusice"
-  google_plus: 
-  instagram: 
+  google_plus:
+  instagram:
   linkedin:  # Full URL
-  pinterest: 
-  reddit: 
-  soundcloud: 
+  pinterest:
+  reddit:
+  soundcloud:
   stack_exchange:  # Full URL
-  steam: 
-  tumblr: 
-  twitter: 
-  wordpress: 
-  youtube: 
-  
+  steam:
+  tumblr:
+  twitter:
+  wordpress:
+  youtube:
+
   # Scripts
   google_analytics: # Tracking ID, e.g. "UA-000000-01"
   disqus_shortname:
-  katex: true # Enable if using math markup 
-  
+  katex: true # Enable if using math markup
+
   # Localization strings
   str_follow_on: "Follow on"
   str_rss_follow: "Follow RSS feed"
@@ -50,7 +53,7 @@ theme:
   str_next: "Next"
   str_prev: "Prev"
   str_continue_reading: "Continue reading"
-  
+
   # Colours, typography and padding
   # Open the "_sass > base" folder, and open "_variables.scss"
 
@@ -60,6 +63,8 @@ paginate_path: "blog/page:num"
 
 # BUILD SETTINGS
 markdown: kramdown
+kramdown:
+  input:         GFM
 highlighter: pygments
 sass:
   sass_dir: _sass

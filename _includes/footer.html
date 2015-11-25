@@ -1,5 +1,11 @@
 <script src="{{ "/js/main.js" | prepend: site.baseurl }}"></script>
 
+<!-- highlight -->
+<script src="/js/highlight.pack.js"></script>
+<script type="text/javascript">
+    hljs.initHighlightingOnLoad();
+</script>
+
 {% if site.theme.footer_text %}
 <footer class="site-footer">
 	<p class="text">{{ site.theme.footer_text }}</p>

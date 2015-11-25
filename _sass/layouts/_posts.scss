@@ -16,6 +16,10 @@ article {
   .footnotes {
     font-size: 0.9em;
   }
+  ul,ol {
+    background-color: #ECECEC;
+    padding: 10px 10px 10px 36px;
+  }
 }
 header {
   h1 {
@@ -52,4 +56,8 @@ code {
   display: block;
   padding: 2%;
   background-color: #ECECEC;
+}
+
+.hljs {
+  padding: 1em;
 }
