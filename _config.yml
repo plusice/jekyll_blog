@@ -9,7 +9,7 @@ url: "http://blog.plusicec.com" # the base hostname & protocol for your site
 theme:
   # Metad
   title: plusice
-  avatar: avatar.png
+  avatar: avatar.jpg
   gravatar: # Email MD5 hash
   description: "A website with blog posts and pages" # used by search engines
 
