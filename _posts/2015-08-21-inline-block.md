@@ -20,7 +20,7 @@ title: 从inline-block到line-height到vertical-align
 ### vertical-align
 
 &ensp;&ensp;&ensp;&ensp;再来看看vertical-align,我还也是搬砖就行吧:[戳我](http://www.zhangxinxu.com/wordpress/2010/05/%E6%88%91%E5%AF%B9css-vertical-align%E7%9A%84%E4%B8%80%E4%BA%9B%E7%90%86%E8%A7%A3%E4%B8%8E%E8%AE%A4%E8%AF%86%EF%BC%88%E4%B8%80%EF%BC%89/)
-&ensp;&ensp;&ensp;&ensp;总结为两句:vertical-align只对inline或inline-block元素有效，是相对于父元素的line-height垂直对齐。vertical-align:text-bottom是相对于父元素文本底部，vertical-align:bottom是相对于父元素line-height底部。
+&ensp;&ensp;&ensp;&ensp;总结为两句:vertical-align只对inline或inline-block元素有效，~~是相对于父元素的line-height垂直对齐~~,实验发现是子元素竖直方向中点与父元素font-size值对应的base-line对齐。vertical-align:text-bottom是相对于父元素文本底部，vertical-align:bottom是相对于父元素line-height底部。
 &ensp;&ensp;&ensp;&ensp;各个基线可以参考:
 <img src="http://2.bp.blogspot.com/-sthQ7pdqw0k/UENQUh1ei-I/AAAAAAAAALk/jb1Ir8dAF6o/s400/Vertical%2BAlign_crop.png">
 
