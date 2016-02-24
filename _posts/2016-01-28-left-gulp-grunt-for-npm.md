@@ -1,8 +1,10 @@
 ---
 layout: post
-title: ［译文］为什么我弃用gulp和grunt而用npm
+title: ［译］为什么我弃用gulp和grunt而用npm
 excerpt: <p>gulp,grunt,npm</p>
 ---
+
+| 原文：<a href="https://medium.com/@housecor/why-i-left-gulp-and-grunt-for-npm-scripts-3d6853dd22b8">Why I Left Gulp and Grunt for npm Scripts</a>
 
 我知道你们在想什么?什么鬼?!Gulp不是刚刚干掉了Grunt吗?为什么我们不能就这样维持一会呢?我知道,但是...
 
@@ -198,4 +200,6 @@ Gulp和Grunt都是我使用过的抽象工具。抽象是有用的，但是也�
 - <a href="http://app.pluralsight.com/courses/npm-build-tool-introduction">Introduction to npm as a Build Tool </a>
 - <a href="http://gon.to/2015/02/26/gulp-is-awesome-but-do-we-really-need-it/">Gulp is awesome, but do we really need it?</a>
 - <a href="http://code.tutsplus.com/courses/npm-scripts-for-build-tooling">NPM Scripts for Build Tooling</a>
+
+
 
