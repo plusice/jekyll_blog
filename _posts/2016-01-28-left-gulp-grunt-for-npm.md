@@ -11,11 +11,11 @@ excerpt: <p>gulp,grunt,npm</p>
 
 ### 我们先从一个例子开始...
 
-我本来很喜欢用Gulp,但在我的最后一个项目,我在gulpfile文件里写了几百行代码,并且使用了十几个插件.用gulp我废了很大力气整合Webpack,Browsersync,hot reloading,Mocha和其他很多东西.因为一些插件在我的这个场景下,文档不是很完善,有些插件只给我提供了我需要的API的一部分.有一个插件有一个bug,它只会检测很少的文件.另一个插件在输出到命令行的时候把颜色都给去掉了.
+我本来很喜欢用Gulp,但在我的最近一个项目,我在gulpfile文件里写了几百行代码,并且使用了十几个插件.用gulp我废了很大力气整合Webpack,Browsersync,hot reloading,Mocha和其他很多东西.因为一些插件在我的这个场景下,文档不是很完善,有些插件只给我提供了我需要的API的一部分.有一个插件有一个bug,它只会检测很少的文件.另一个插件在输出到命令行的时候把颜色都给去掉了.
 
 这些都是可以解决的问题,**但是我在直接调用这些工具的时候,一个问题也没有出现.**
 
-后面我注意到很多开源的项目都直接使用了npm scripts.我决定退后一步重新评估,我真的需要Gulp吗?结果证明我需要.
+后面我注意到很多开源的项目都直接使用了npm scripts.我决定退后一步重新评估,我真的需要Gulp吗?结果证明我不需要.
 
 我决定在我新的开源项目上使用npm scripts.我只使用了npm scripts,为React应用创建了一个丰富的开发环境和构建程序.很好奇这是什么样的吗?点击这里<a href="https://github.com/coryhouse/react-slingshot">React Slingshot</a>.
 
@@ -56,7 +56,7 @@ Gulp和Grunt遇到问题你通常都要等作者提供更新,或者自己修复.
 
 **了解了工具是不够的,还需要你了解这个工具对应Gulp和Grunt的插件的使用**
 
-大多构建相关的工具提供了清晰,强大和具有完善文档的命令行接口.看一下<a href="http://eslint.org/docs/user-guide/command-line-interface">docs on ESLint's CLI</a>,就是一个很好的例子.我发现在npm scripts中阅读并且实现一个剪短的命令行调用会更清晰,更直接,并且更容易调试(因为没有了一层抽象).
+大多构建相关的工具提供了清晰,强大和具有完善文档的命令行接口.看一下<a href="http://eslint.org/docs/user-guide/command-line-interface">docs on ESLint's CLI</a>,就是一个很好的例子.我发现在npm scripts中阅读并且实现一个简短的命令行调用会更清晰,更直接,并且更容易调试(因为没有了一层抽象).
 
 现在我已经列出了所有痛点,问题是,为什么我们认为我们需要像Gulp和Grunt之类的任务执行器.
 
@@ -114,7 +114,7 @@ npm scripts其实是很强大的!有一份基于<a href="https://docs.npmjs.com/
 
 你也可以在一行脚本用&&串行调用多个脚本.上面例子的clean任务,将会顺序执行各个脚本.如果你是一个讨厌Gulp中一长串任务写法的人,这种简单会让你做梦都笑的.
 
-并且如果一个命令变得太复杂了,你也可以调用调用其他的文件:
+并且如果一个命令变得太复杂了,你也可以调用其他的文件:
 
 ```
 {
@@ -156,12 +156,11 @@ npm run script1.js & npm run script2.js
 你的操作系统命令行执行了npm脚本，所以在Linux和OSX你的npm脚本通过Unix命令行执行。而Windows上，npm脚本通过Windows命令行执行。因此，如果你要你的构建脚本可以在所有平台上执行，你要让Unix和Windows都开心。下面是3个方法：
 
 **方法1:** 使用跨平台的命令，很幸运的是竟然有如此多的跨平台命令，以下是其中一些：
-```
-&& chain tasks (Run one task after another)
-< input file contents to a command
-> redirect command output to a file
-| redirect command output to another command
-```
+
+- && chain tasks (Run one task after another)
+- < input file contents to a command
+- \> redirect command output to a file
+- \| redirect command output to another command
 
 **方法2:** 使用node packages。你可以使用node packages取代shell命令。例如，使用<a href="https://www.npmjs.com/package/rimraf">rimraf</a>取代“rm -rf”。使用<a href="https://www.npmjs.com/package/cross-env">cross-env</a>来跨平台设置环境变量。在Google，npm或者<a href="https://libraries.io/">lirbraries.io</a>上搜索你所需要的node package，一般都能找到一个可以跨平台的。另外，如果你的命令行调用过长，你可以用分离的脚本调用node packages，像这样：
 
