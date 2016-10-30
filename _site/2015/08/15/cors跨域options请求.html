@@ -7,26 +7,29 @@
 	<meta name="description" content="      终于找到时间（不偷懒）来填三个星期前挖的坑了，虽然不是什么干货，但是通过写写文章，也可以增强自己的语言组织能力，这点对程序员后面的发展也是至关重要的。切入正题，这次记录以下我用cors跨域时失败的问题（不涉及cookie跨域）。">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="X-Frame-Options" content="sameorigin">
-	
-	<!-- CSS -->
-	<link rel="stylesheet" href="/css/main.css">
-	
+
 	<!--Favicon-->
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-	
+
 	<!-- Canonical -->
-	<link rel="canonical" href="http://blog.plusicec.com/2015/08/15/cors%E8%B7%A8%E5%9F%9Foptions%E8%AF%B7%E6%B1%82.html">
-	
+	<link rel="canonical" href="http://blog.plusice.net/2015/08/15/cors%E8%B7%A8%E5%9F%9Foptions%E8%AF%B7%E6%B1%82.html">
+
 	<!-- RSS -->
-	<link rel="alternate" type="application/atom+xml" title="plusice" href="http://blog.plusicec.com/feed.xml" />
-	
+	<link rel="alternate" type="application/atom+xml" title="plusice" href="http://blog.plusice.net/feed.xml" />
+
 	<!-- Font Awesome -->
 	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-	
+
 	<!-- Google Fonts -->
 	<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic" rel="stylesheet" type="text/css">
-	
-  <!-- KaTeX -->
+
+	<!-- highlight -->
+	<link rel="stylesheet" href="/css/highlight/darkula.css">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="/css/main.css">
+
+  	<!-- KaTeX -->
 	
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
 	<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
@@ -43,7 +46,7 @@
 	<div class="branding">
 		
 		<a href="/">
-			<img class="avatar" src="/img/avatar.png" alt=""/>
+			<img class="avatar" src="/img/avatar.jpg" alt=""/>
 		</a>
 		
 		
@@ -61,6 +64,8 @@
 				<li>
 					<a class="page-link" href="/about/">About</a>
 				</li>
+				
+			
 				
 			
 				
@@ -117,7 +122,7 @@
 
 
 <li>
-	<a href="http://blog.plusicec.com/feed.xml" title="Follow RSS feed">
+	<a href="http://blog.plusice.net/feed.xml" title="Follow RSS feed">
 		<i class="fa fa-fw fa-rss"></i>
 	</a>
 </li>
@@ -133,7 +138,7 @@
 
   <header style="background-image: url('/')">
     <h1 class="title">CORS  options请求</h1>
-    
+
     <p class="meta">
     August 15, 2015
     
@@ -147,15 +152,14 @@
 
 <p>      google了些许时间后才发现问题，我前端使用angualr写的，其他人的认证模块在请求里插入了自定义的头域，而这是cors请求出现options预请求的其中一种情况，当出现以下一种情况就会发出预请求（其他情况和正常请求一样）：</p>
 
-<blockquote>
-  <ul>
-    <li>请求以 GET, HEAD 或者 POST 以外的方法发起请求。或者，使用 POST，但请求数据为 application/x-www-form-urlencoded, multipart/form-data 或者 text/plain 以外的数据类型。比如说，用 POST 发送数据类型为 application/xml 或者 text/xml 的 XML 数据的请求。</li>
-    <li>使用自定义请求头（比如添加诸如 X-PINGOTHER）。</li>
-  </ul>
-</blockquote>
+<ul>
+  <li>请求以 GET, HEAD 或者 POST 以外的方法发起请求。或者，使用 POST，但请求数据为 application/x-www-form-urlencoded, multipart/form-data 或者 text/plain 以外的数据类型。比如说，用 POST 发送数据类型为 application/xml 或者 text/xml 的 XML 数据的请求。</li>
+  <li>
+    <p>使用自定义请求头（比如添加诸如 X-PINGOTHER）。</p>
 
-<pre><code>提示：从Gecko 2.0开始，text/plain, application/x-www-form-urlencoded 和 multipart/form-data 类型的数据都可以直接用于跨站请求，而不需要先发起“预请求”了。之前，只有 text/plain 可以不用先发起“预请求”，进行跨站请求。
-</code></pre>
+    <p>提示：从Gecko 2.0开始，text/plain, application/x-www-form-urlencoded 和 multipart/form-data 类型的数据都可以直接用于跨站请求，而不需要先发起“预请求”了。之前，只有 text/plain 可以不用先发起“预请求”，进行跨站请求。</p>
+  </li>
+</ul>
 
 <p>      找到发起options请求的原因了，那为什么会404呢，原因也是非常简单，后端没处理。。。所以其实一切的一切都不是前端的问题，想允许跨域，后端对原始请求设置Access-Control-Allow-Origin响应头，对其预请求——options请求进行响应，并对options请求添加相关响应头即可：</p>
 
@@ -179,20 +183,44 @@ Access-Control-Allow-Headers: X-PINGOTHER            // 允许跨域的自定义
 <p>参考链接：<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS">点击跳转</a></p>
 
   </section>
-  
+
 </article>
 
 <!-- Disqus -->
 
+<div class="comments">
+  <div id="ds-thread" class="ds-thread" data-url="/2015/08/15/cors%E8%B7%A8%E5%9F%9Foptions%E8%AF%B7%E6%B1%82.html" data-title="CORS  options请求" data-thread-key="CORS  options请求"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name: 'plusice'};
+(function() {
+var ds = document.createElement('script');
+ds.type = 'text/javascript';ds.async = true;
+ds.src = 'http://static.duoshuo.com/embed.js';
+ds.charset = 'UTF-8';
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+})();
+</script>
+
+</div>
+
+
+
     </div>
 
     <script src="/js/main.js"></script>
+
+<!-- highlight -->
+<script src="/js/highlight.pack.js"></script>
+<script type="text/javascript">
+    hljs.initHighlightingOnLoad();
+</script>
 
 
 <footer class="site-footer">
 	<p class="text">Powered by <a href="http://jekyllrb.com">Jekyll</a> with <a href="https://rohanchandra.github.io/project/type/">Type Theme</a>
 </p>
 </footer>
+
 
   </body>
   

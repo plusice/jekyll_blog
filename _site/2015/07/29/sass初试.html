@@ -7,26 +7,29 @@
 	<meta name="description" content="      虽然sass出了很久了，但一直没有使用，因为在前公司没有使用编译工具，只有自己使用的话会怕导致不好维护（其实也是懒的借口）。">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="X-Frame-Options" content="sameorigin">
-	
-	<!-- CSS -->
-	<link rel="stylesheet" href="/css/main.css">
-	
+
 	<!--Favicon-->
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-	
+
 	<!-- Canonical -->
-	<link rel="canonical" href="http://blog.plusicec.com/2015/07/29/sass%E5%88%9D%E8%AF%95.html">
-	
+	<link rel="canonical" href="http://blog.plusice.net/2015/07/29/sass%E5%88%9D%E8%AF%95.html">
+
 	<!-- RSS -->
-	<link rel="alternate" type="application/atom+xml" title="plusice" href="http://blog.plusicec.com/feed.xml" />
-	
+	<link rel="alternate" type="application/atom+xml" title="plusice" href="http://blog.plusice.net/feed.xml" />
+
 	<!-- Font Awesome -->
 	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-	
+
 	<!-- Google Fonts -->
 	<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic" rel="stylesheet" type="text/css">
-	
-  <!-- KaTeX -->
+
+	<!-- highlight -->
+	<link rel="stylesheet" href="/css/highlight/darkula.css">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="/css/main.css">
+
+  	<!-- KaTeX -->
 	
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
 	<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
@@ -43,7 +46,7 @@
 	<div class="branding">
 		
 		<a href="/">
-			<img class="avatar" src="/img/avatar.png" alt=""/>
+			<img class="avatar" src="/img/avatar.jpg" alt=""/>
 		</a>
 		
 		
@@ -61,6 +64,8 @@
 				<li>
 					<a class="page-link" href="/about/">About</a>
 				</li>
+				
+			
 				
 			
 				
@@ -117,7 +122,7 @@
 
 
 <li>
-	<a href="http://blog.plusicec.com/feed.xml" title="Follow RSS feed">
+	<a href="http://blog.plusice.net/feed.xml" title="Follow RSS feed">
 		<i class="fa fa-fw fa-rss"></i>
 	</a>
 </li>
@@ -133,7 +138,7 @@
 
   <header style="background-image: url('/')">
     <h1 class="title">sass入门使用总结</h1>
-    
+
     <p class="meta">
     July 29, 2015
     
@@ -222,7 +227,7 @@ div {
 <p>      引入compass/animation后可以写成</p>
 
 <pre><code>div {
-    @include animation(test);       
+    @include animation(test);
 }
 </code></pre>
 
@@ -230,20 +235,44 @@ div {
 
 
   </section>
-  
+
 </article>
 
 <!-- Disqus -->
 
+<div class="comments">
+  <div id="ds-thread" class="ds-thread" data-url="/2015/07/29/sass%E5%88%9D%E8%AF%95.html" data-title="sass入门使用总结" data-thread-key="sass入门使用总结"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name: 'plusice'};
+(function() {
+var ds = document.createElement('script');
+ds.type = 'text/javascript';ds.async = true;
+ds.src = 'http://static.duoshuo.com/embed.js';
+ds.charset = 'UTF-8';
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+})();
+</script>
+
+</div>
+
+
+
     </div>
 
     <script src="/js/main.js"></script>
+
+<!-- highlight -->
+<script src="/js/highlight.pack.js"></script>
+<script type="text/javascript">
+    hljs.initHighlightingOnLoad();
+</script>
 
 
 <footer class="site-footer">
 	<p class="text">Powered by <a href="http://jekyllrb.com">Jekyll</a> with <a href="https://rohanchandra.github.io/project/type/">Type Theme</a>
 </p>
 </footer>
+
 
   </body>
   

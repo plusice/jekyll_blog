@@ -7,26 +7,29 @@
 	<meta name="description" content="A website with blog posts and pages">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="X-Frame-Options" content="sameorigin">
-	
-	<!-- CSS -->
-	<link rel="stylesheet" href="/css/main.css">
-	
+
 	<!--Favicon-->
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-	
+
 	<!-- Canonical -->
-	<link rel="canonical" href="http://blog.plusicec.com/">
-	
+	<link rel="canonical" href="http://blog.plusice.net/">
+
 	<!-- RSS -->
-	<link rel="alternate" type="application/atom+xml" title="plusice" href="http://blog.plusicec.com/feed.xml" />
-	
+	<link rel="alternate" type="application/atom+xml" title="plusice" href="http://blog.plusice.net/feed.xml" />
+
 	<!-- Font Awesome -->
 	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-	
+
 	<!-- Google Fonts -->
 	<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic" rel="stylesheet" type="text/css">
-	
-  <!-- KaTeX -->
+
+	<!-- highlight -->
+	<link rel="stylesheet" href="/css/highlight/darkula.css">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="/css/main.css">
+
+  	<!-- KaTeX -->
 	
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
 	<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
@@ -43,7 +46,7 @@
 	<div class="branding">
 		
 		<a href="/">
-			<img class="avatar" src="/img/avatar.png" alt=""/>
+			<img class="avatar" src="/img/avatar.jpg" alt=""/>
 		</a>
 		
 		
@@ -61,6 +64,8 @@
 				<li>
 					<a class="page-link" href="/about/">About</a>
 				</li>
+				
+			
 				
 			
 				
@@ -117,7 +122,7 @@
 
 
 <li>
-	<a href="http://blog.plusicec.com/feed.xml" title="Follow RSS feed">
+	<a href="http://blog.plusice.net/feed.xml" title="Follow RSS feed">
 		<i class="fa fa-fw fa-rss"></i>
 	</a>
 </li>
@@ -142,18 +147,18 @@
     
       <header>
         <h1>
-          <a class="post-link" href="/2015/08/15/cors%E8%B7%A8%E5%9F%9Foptions%E8%AF%B7%E6%B1%82.html">CORS  options请求</a>
+          <a class="post-link" href="/2016/10/11/mock-data.html">前端开发中如何优雅地模拟数据</a>
         </h1>
         
-        <p class="meta">August 15, 2015</p>
+        <p class="meta">October 11, 2016</p>
       </header>
 
       <div class="excerpt">
-        <p>      终于找到时间（不偷懒）来填三个星期前挖的坑了，虽然不是什么干货，但是通过写写文章，也可以增强自己的语言组织能力，这点对程序员后面的发展也是至关重要的。切入正题，这次记录以下我用cors跨域时失败的问题（不涉及cookie跨域）。</p>
+        <p>前端发展至今，开发中基本上都是和后端分离的，与后端无关的功能我们可以自己开发，但涉及到与后端数据交互相关的功能，没有了后端的配合，我们就需要自己动手了。这里就主要介绍几种我工作中使用到的方法，用来模拟后端返回的数据。</p>
 
 
 
-        <a class="button" href="/2015/08/15/cors%E8%B7%A8%E5%9F%9Foptions%E8%AF%B7%E6%B1%82.html">Continue reading</a>
+        <a class="button" href="/2016/10/11/mock-data.html">Continue reading</a>
       </div>
       
     </div>
@@ -162,18 +167,18 @@
     
       <header>
         <h1>
-          <a class="post-link" href="/2015/07/29/sass%E5%88%9D%E8%AF%95.html">sass入门使用总结</a>
+          <a class="post-link" href="/2016/07/23/webpack-vue.html">实战webpack+vue</a>
         </h1>
         
-        <p class="meta">July 29, 2015</p>
+        <p class="meta">July 23, 2016</p>
       </header>
 
       <div class="excerpt">
-        <p>      虽然sass出了很久了，但一直没有使用，因为在前公司没有使用编译工具，只有自己使用的话会怕导致不好维护（其实也是懒的借口）。</p>
+        <p>变懒了，发现原来已经半年没写过一篇东西了，这半年，又换了一个工作的地方，现在觉得，人不能太浮躁。当然，也还是要有跳出舒适区的决心。</p>
 
 
 
-        <a class="button" href="/2015/07/29/sass%E5%88%9D%E8%AF%95.html">Continue reading</a>
+        <a class="button" href="/2016/07/23/webpack-vue.html">Continue reading</a>
       </div>
       
     </div>
@@ -182,18 +187,52 @@
     
       <header>
         <h1>
-          <a class="post-link" href="/2015/03/15/first-post.html">开篇——跳槽之路</a>
+          <a class="post-link" href="/2016/01/28/left-gulp-grunt-for-npm.html">［译］为什么我弃用gulp和grunt而用npm</a>
         </h1>
         
-        <p class="meta">March 15, 2015</p>
+        <p class="meta">January 28, 2016</p>
       </header>
 
       <div class="excerpt">
-        <p>      最近在忙着找下家，才知道了自己技术的匮乏。去年试了一下用jekyll在github pages写博客，但是一直没装扮好，现在倒是想抽空弄了一下。可惜windows下安装ruby实在蛋疼，只能复制了一个主题放了上去，这倒促使我想买mbp了。</p>
+        <p>gulp,grunt,npm</p>
 
+        <a class="button" href="/2016/01/28/left-gulp-grunt-for-npm.html">Continue reading</a>
+      </div>
+      
+    </div>
+    
+    <div class="post-teaser">
+    
+      <header>
+        <h1>
+          <a class="post-link" href="/2016/01/27/chrome-highlighter.html">chrome文本高亮笔记插件</a>
+        </h1>
+        
+        <p class="meta">January 27, 2016</p>
+      </header>
 
+      <div class="excerpt">
+        <p>chrome插件,笔记,高亮文本</p>
 
-        <a class="button" href="/2015/03/15/first-post.html">Continue reading</a>
+        <a class="button" href="/2016/01/27/chrome-highlighter.html">Continue reading</a>
+      </div>
+      
+    </div>
+    
+    <div class="post-teaser">
+    
+      <header>
+        <h1>
+          <a class="post-link" href="/2015/11/30/angular2%E5%88%9D%E8%AF%95.html">angular2初试</a>
+        </h1>
+        
+        <p class="meta">November 30, 2015</p>
+      </header>
+
+      <div class="excerpt">
+        <p>angular2,组件化，模块化,typescript,systemjs,angular2教程</p>
+
+        <a class="button" href="/2015/11/30/angular2%E5%88%9D%E8%AF%95.html">Continue reading</a>
       </div>
       
     </div>
@@ -201,17 +240,36 @@
   </div>
 
   
+  <div class="pagination">
+  
+    
+
+    
+    <a href="/blog/page2" class="button" >
+      Next 
+      <i class="fa fa-chevron-right"></i>
+    </a>
+    
+  </div>
+  
 </div>
 
     </div>
 
     <script src="/js/main.js"></script>
 
+<!-- highlight -->
+<script src="/js/highlight.pack.js"></script>
+<script type="text/javascript">
+    hljs.initHighlightingOnLoad();
+</script>
+
 
 <footer class="site-footer">
 	<p class="text">Powered by <a href="http://jekyllrb.com">Jekyll</a> with <a href="https://rohanchandra.github.io/project/type/">Type Theme</a>
 </p>
 </footer>
+
 
   </body>
   

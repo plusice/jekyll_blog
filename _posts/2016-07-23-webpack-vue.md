@@ -159,4 +159,6 @@ module.exports = {
 
 ![图片](/img/resource/amazeui.png)
 
-代码在这里：[点击跳转](https://github.com/plusice/vue-app)，持续更新中
+代码在这里：[点击跳转](https://github.com/plusice/vue-app)，持续更新中...
+
+最近添加了些组件：[demo](https://plusice.github.io/vue-app/)

@@ -2,30 +2,786 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>plusice</title>
-    <atom:link href="http://blog.plusicec.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <link>http://blog.plusicec.com/</link>
+    <atom:link href="http://blog.plusice.net/feed.xml" rel="self" type="application/rss+xml"/>
+    <link>http://blog.plusice.net/</link>
     <description>A website with blog posts and pages</description>
-    <pubDate>Sat, 15 Aug 2015 20:12:44 +0800</pubDate>
+    <pubDate>Sun, 30 Oct 2016 21:08:27 +0800</pubDate>
+    
+      <item>
+        <title>前端开发中如何优雅地模拟数据</title>
+        <link>http://blog.plusice.net/2016/10/11/mock-data.html</link>
+        <guid isPermaLink="true">http://blog.plusice.net/2016/10/11/mock-data.html</guid>
+        <description>&lt;p&gt;前端发展至今，开发中基本上都是和后端分离的，与后端无关的功能我们可以自己开发，但涉及到与后端数据交互相关的功能，没有了后端的配合，我们就需要自己动手了。这里就主要介绍几种我工作中使用到的方法，用来模拟后端返回的数据。&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;1.代理工具&lt;/h3&gt;
+
+&lt;p&gt;使用一些代理工具，我们可以将浏览器的请求拦截并返回其他内容。通常的做法是将请求映射到本地文件，返回请求时返回文件内容，例如配置 test.com/ 映射到本地目录 /test/ ，实现接口 test.com/req 返回文件 /test/req 的内容。各系统都有相应的工具：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;fiddler＋willow，for windows&lt;/li&gt;
+  &lt;li&gt;charles/wireshark，for mac/linux&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这里以charles为例介绍一下其用法，其实很简单，打开tools =&amp;gt; Map Local，然后按下图这样配置好映射就可以了：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/resource/mock-data-1.png&quot; alt=&quot;图片&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;上面的配置是直接映射到某个文件，也可以配置 test/* 映射到本地 /test/目录，这样会根据后面的具体路径去本地寻找映射文件。但是我们还需要重置返回的http编码头域，不然可能会出现乱码，打开tools=&amp;gt;rewrite，按照下图配置即可：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/resource/mock-data-2.png&quot; alt=&quot;图片&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;mockjs&quot;&gt;2.Mockjs&lt;/h3&gt;
+
+&lt;p&gt;虽然用代理工具模拟数据很方便，但模拟的数据写起来好像有点麻烦，如果我们要模拟一个100条数据的返回，用复制粘贴还要敲多好几次键盘，而且数据都是写死的无法改变。有没有更优雅的方法呢？这时候我们就可以用上另外一个工具Mockjs了。&lt;/p&gt;
+
+&lt;p&gt;Mockjs是一个通过覆盖和模拟原生XMLHttpRequest,拦截ajax请求，返回模拟数据的前端库。它通过随机数据，模拟各种场景，支持生成随机的文本、数字、布尔值、日期、邮箱、链接、图片、颜色等。具体介绍可以看官网：&lt;a href=&quot;http://mockjs.com/&quot;&gt;点击跳转&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;它的使用也非常简单，引入库文件后我们可以像下面这么写，拦截所有.json结尾的get请求，并返回json数据{“data”:”test”}&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Mock.mock(/\.json/, &#39;get&#39;, function(options) {
+	return Mock.mock({
+		data: &#39;test&#39;
+	})
+})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Mockjs模拟了很多场景，人名省份城市时间等，因为作者是中国人，所以包含了中国各个城市，并且可以模拟中文名。详细可以参照官网示例：&lt;a href=&quot;http://mockjs.com/examples.html&quot;&gt;点击跳转&lt;/a&gt;。这里简单介绍一个例子，模拟一个100个城市的数组(在官网示例页面控制台可以自己玩)：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Mock.mock({&#39;data|100&#39;:[&#39;@city&#39;]})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;看，是不是很方便。&lt;/p&gt;
+
+&lt;h3 id=&quot;rapswagger&quot;&gt;3.RAP和swagger&lt;/h3&gt;
+
+&lt;p&gt;因为Mockjs拦截了ajax请求，所以我们没办法从浏览器控制台看到请求的信息。而且我们需要向我们的项目中引入其他代码，在上线的时候需要记得把它去掉。所以我们有没有更深一层优雅的方法呢？方法肯定是有的，轮子已经造好了，就等着我们去用了。&lt;/p&gt;
+
+&lt;h4 id=&quot;rap&quot;&gt;RAP&lt;/h4&gt;
+&lt;p&gt;RAP是阿里出的一个接口管理系统，结合了文档、Mock.js、可视化、Rest、接口过渡、文档修改提醒、支持本地部署。简单来说就是一个管理系统，你可以在上面添加团队-&amp;gt;项目-&amp;gt;页面-&amp;gt;接口，将公司的各产品的接口集中管理起来，并且系统可以根据添加的接口填写的内容，生成模拟接口。这可以让前端人员开发时调用。详细的用法还是看官网介绍比较清楚，注册一个号去玩玩也是很方便的：&lt;a href=&quot;http://rap.taobao.org/&quot;&gt;点击跳转&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;swagger&quot;&gt;swagger&lt;/h4&gt;
+
+&lt;p&gt;而swagger是一个通过编写接口文档，生成接口模拟数据的工具。文档需按照某种格式编写。好处就是以文档的形式比较好维护，但坏处就是需要熟悉文档格式需要一个过程，而且没有像RAP那样将接口分团队分项目页面进行管理。&lt;a href=&quot;http://editor.swagger.io/#/&quot;&gt;点击跳转&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;4.模拟页面数据&lt;/h3&gt;
+
+&lt;p&gt;文章到了这里本应该结束了，但是我想起如果要模拟一个页面返回要怎么办呢？作为一个切图仔，我想说就交给后端去做吧，除非页面就是我们切图仔负责写的。但如果页面不是用nodejs写的，类似jsp页面，也不是我们负责的，我们该怎么办呢。这时候我们只能用一些简陋的方法，在nodejs力所能及的范围内将页面进行渲染。例如有这么一个插件（&lt;a href=&quot;https://github.com/DanielSchaffer/node-jsp&quot;&gt;点击跳转&lt;/a&gt;），它可以对一些简单的&amp;lt;c&amp;gt;标签语法进行解析渲染，对于无法解析的内容则当成页面内容输出，利用这种插件就可以启动一个nodejs服务来完(jian)美(lou)地模拟一个页面了!&lt;/p&gt;
+</description>
+        <pubDate>Tue, 11 Oct 2016 00:00:00 +0800</pubDate>
+      </item>
+    
+      <item>
+        <title>实战webpack+vue</title>
+        <link>http://blog.plusice.net/2016/07/23/webpack-vue.html</link>
+        <guid isPermaLink="true">http://blog.plusice.net/2016/07/23/webpack-vue.html</guid>
+        <description>&lt;p&gt;变懒了，发现原来已经半年没写过一篇东西了，这半年，又换了一个工作的地方，现在觉得，人不能太浮躁。当然，也还是要有跳出舒适区的决心。&lt;/p&gt;
+
+&lt;h3 id=&quot;vue&quot;&gt;为什么使用vue&lt;/h3&gt;
+&lt;p&gt;虽然换了工作，但是工作内容还是没有变化多少，目前为止接触的还是一些to B的管理系统项目，作为一个前端，没能负责一个to C的产品，还是有点小伤感的。好的是没有旧项目要维护，一切从零开始，而且不用兼容低版本浏览器。所以项目在技术选型上是很自由的。现在基本上是使用了webpack＋vue的技术方案。之所以选择vue有以下几个原因：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;vue结合了Angular和React的优点，可以方便的使用数据双向绑定，又可以方便的实现组件化&lt;/li&gt;
+  &lt;li&gt;很重要的一点，公司有使用vue的项目经验&lt;/li&gt;
+  &lt;li&gt;vue上手比较快，基本上看一天教程就可以上手干活了（这点对我们来说非常重要。。）&lt;/li&gt;
+  &lt;li&gt;社区现在也很活跃，作者尤大貌似要全职做vue开发了&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;因为ES6是后面的趋势，所以就直接上了vue推荐的方案：使用webpack+ES6+vue-loader。&lt;/p&gt;
+
+&lt;h3 id=&quot;es6&quot;&gt;先弄个ES6吧&lt;/h3&gt;
+&lt;p&gt;以下进入正题，首先从package.json文件开始吧，先看一下需要什么npm包能够用ES6把vue写起来：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &quot;name&quot;: &quot;vue-webpack&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;description&quot;: &quot;&quot;,
+  &quot;main&quot;: &quot;index.js&quot;,
+  &quot;scripts&quot;: {
+    &quot;test&quot;: &quot;echo \&quot;Error: no test specified\&quot; &amp;amp;&amp;amp; exit 1&quot;,
+    &quot;dev&quot;: &quot;webpack&quot;
+  },
+  &quot;author&quot;: &quot;&quot;,
+  &quot;license&quot;: &quot;ISC&quot;,
+  &quot;devDependencies&quot;: {
+    &quot;babel-core&quot;: &quot;^6.11.4&quot;,
+    &quot;babel-loader&quot;: &quot;^6.2.4&quot;,
+    &quot;babel-preset-es2015&quot;: &quot;^6.9.0&quot;,
+    &quot;webpack&quot;: &quot;^1.13.1&quot;
+  },
+  &quot;dependencies&quot;: {
+    &quot;vue&quot;: &quot;^1.0.26&quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;我们除了使用babel-core和babel-loader外，还要使用babel-preset-es2015，因为在babel 6之后，默认没有指定转换的js版本，所以这里跑了webpack之后是不会将ES6代码转换的，如果需要转换ES2015，即需要安装多这个包。再写好webpack.config.js后，我们就可以愉快地开始coding了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var path = require(&#39;path&#39;);
+module.exports = {
+    entry: &quot;./entry.js&quot;,
+    output: {
+        path: &#39;./static&#39;,
+        publicPath: &#39;/static/&#39;,
+        filename: &#39;main.js&#39;
+    },
+    module: {
+        // 特定规则的文件与特定loader的映射
+        loaders: [
+            {
+                test: /\.js$/,
+                loader: &#39;babel&#39;,
+                query: {
+                    // since babel 6 needs preset to determin what to transform
+                    presets: [&#39;es2015&#39;]
+                }
+            }
+        ]
+    },
+
+    resolve: {
+        root: [__dirname + &#39;/src&#39;]
+    },
+
+    devtool: &#39;#source-map&#39;
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;vue-loader&quot;&gt;加个vue-loader&lt;/h3&gt;
+&lt;p&gt;其实这个vue-loader我个人是觉得可有可无的，因为我认为组件的样式和模板是没必要放在一个文件的，至少在我的项目是这样。但是为了尝鲜还是决定用一下。&lt;br /&gt;
+所需npm包如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    {
+      &quot;vue-loader&quot;: &quot;^8.5.3&quot;,
+      &quot;vue-hot-reload-api&quot;: &quot;^1.2.0&quot;,
+      &quot;vue-html-loader&quot;: &quot;^1.2.3&quot;,
+      &quot;vue-style-loader&quot;: &quot;^1.0.0&quot;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;而webpack.config.js加上对应的loader，还有有一些不用babel转换的就剔除掉（exclude）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;loaders: [
+    {
+        test: /\.vue$/,
+        loader: &#39;vue&#39;
+    },
+    {
+        test: /\.js$/,
+        loader: &#39;babel&#39;,
+        exclude: /node_modules|vue\/dist|vue-router\/|vue-loader\/|vue-hot-reload-api\//,
+        query: {
+            // since babel 6 needs preset to determin what to transform
+            presets: [&#39;es2015&#39;]
+        }
+    }
+]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;至此已经可以愉快地用es6写vue啦，可以参考这个例子：&lt;a href=&quot;https://github.com/plusice/vue-app/tree/v1.0&quot;&gt;点击跳转&lt;/a&gt;，下载下来安装完npm包后，执行“npm run dev”，再“npm run test”就可以看到效果啦&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;一个应用骨架&lt;/h3&gt;
+&lt;p&gt;配置好基础的几个包，可以着手开始一个应用骨架的搭建了，我目前主要做是管理系统，就搭建一个后台管理系统的骨架吧。&lt;br /&gt;
+搭建一个应用，我们还需要路由，通信模块，还有样式。路由不用说就是vue-router,通信使用jquery，考虑到jquery还可能有其他用途，样式就弄一个amaze UI，自己样式用sass编写。最后的webpack.config.js是这样子的：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var path = require(&#39;path&#39;);
+module.exports = {
+    entry: &quot;./src/entry.js&quot;,
+    output: {
+        path: &#39;./static&#39;,
+        publicPath: &#39;/static/&#39;,
+        filename: &#39;main.js&#39;
+    },
+    module: {
+        loaders: [
+            {
+                test: /\.vue$/,
+                loader: &#39;vue&#39;
+            },
+            {
+                test: /\.scss$/,
+                loaders: [&quot;style&quot;, &quot;css&quot;, &quot;sass&quot;] 
+            },
+            {
+                test: /\.js$/,
+                loader: &#39;babel&#39;,
+                exclude: /node_modules|vue\/dist|vue-router\/|vue-loader\/|vue-hot-reload-api\//,
+                query: {
+                    // since babel 6 needs preset to determin what to transform
+                    presets: [&#39;es2015&#39;]
+                }
+            }
+        ]
+    },
+
+    resolve: {
+        root: [path.resolve(__dirname, &quot;./src&quot;)]
+    },
+
+    devtool: &#39;#source-map&#39;
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最终骨架效果如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/resource/amazeui.png&quot; alt=&quot;图片&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;代码在这里：&lt;a href=&quot;https://github.com/plusice/vue-app&quot;&gt;点击跳转&lt;/a&gt;，持续更新中…&lt;/p&gt;
+
+&lt;p&gt;最近添加了些组件：&lt;a href=&quot;https://plusice.github.io/vue-app/&quot;&gt;demo&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Sat, 23 Jul 2016 00:00:00 +0800</pubDate>
+      </item>
+    
+      <item>
+        <title>［译］为什么我弃用gulp和grunt而用npm</title>
+        <link>http://blog.plusice.net/2016/01/28/left-gulp-grunt-for-npm.html</link>
+        <guid isPermaLink="true">http://blog.plusice.net/2016/01/28/left-gulp-grunt-for-npm.html</guid>
+        <description>&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;原文：&lt;a href=&quot;https://medium.com/@housecor/why-i-left-gulp-and-grunt-for-npm-scripts-3d6853dd22b8&quot;&gt;Why I Left Gulp and Grunt for npm Scripts&lt;/a&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;我知道你们在想什么?什么鬼?!Gulp不是刚刚干掉了Grunt吗?为什么我们不能就这样维持一会呢?我知道,但是…&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;我发现Gulp和Grunt是没有必要的抽象,npm script更强大,并且通常更好用&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;我们先从一个例子开始…&lt;/h3&gt;
+
+&lt;p&gt;我本来很喜欢用Gulp,但在我的最近一个项目,我在gulpfile文件里写了几百行代码,并且使用了十几个插件.用gulp我废了很大力气整合Webpack,Browsersync,hot reloading,Mocha和其他很多东西.因为一些插件在我的这个场景下,文档不是很完善,有些插件只给我提供了我需要的API的一部分.有一个插件有一个bug,它只会检测很少的文件.另一个插件在输出到命令行的时候把颜色都给去掉了.&lt;/p&gt;
+
+&lt;p&gt;这些都是可以解决的问题,&lt;strong&gt;但是我在直接调用这些工具的时候,一个问题也没有出现.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;后面我注意到很多开源的项目都直接使用了npm scripts.我决定退后一步重新评估,我真的需要Gulp吗?结果证明我不需要.&lt;/p&gt;
+
+&lt;p&gt;我决定在我新的开源项目上使用npm scripts.我只使用了npm scripts,为React应用创建了一个丰富的开发环境和构建程序.很好奇这是什么样的吗?点击这里&lt;a href=&quot;https://github.com/coryhouse/react-slingshot&quot;&gt;React Slingshot&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;很震惊的是,我现在宁愿使用npm scripts而不用Gulp了.以下是原因:&lt;/p&gt;
+
+&lt;h3 id=&quot;gulpgrunt&quot;&gt;Gulp和Grunt有什么问题?&lt;/h3&gt;
+
+&lt;p&gt;用了一段时间后，我发现类似Gulp和Grunt的任务执行工具有三个主要的问题:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;依赖插件作者&lt;/li&gt;
+  &lt;li&gt;难以调试&lt;/li&gt;
+  &lt;li&gt;杂乱的文档&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;我们先来看一下这几个问题&lt;/p&gt;
+
+&lt;h4 id=&quot;section-1&quot;&gt;问题1:依赖插件作者&lt;/h4&gt;
+&lt;p&gt;当你使用新技术或者不流行的技术时,可能根本没有相关的插件.即使有插件,它可能是过期的.例如,Babel 6最近发布了.API改变了不少,所以很多Gulp插件就不兼容最新的版本了.使用Gulp的时候,因为我需要的一些插件还没更新,我时常会遇到问题.&lt;/p&gt;
+
+&lt;p&gt;Gulp和Grunt遇到问题你通常都要等作者提供更新,或者自己修复.这限制了你使用很多流行工具的最近版本.而另一方面,当我使用npm scripts,我是直接使用工具,而没有额外一层的抽象.&lt;/p&gt;
+
+&lt;p&gt;至于插件数量上的对比,谁能跟npm比:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/resource/npm-package-num.png&quot; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;section-2&quot;&gt;问题2:难以调试&lt;/h4&gt;
+&lt;p&gt;使用Grnt和Gulp构建失败时,调试是比较麻烦的.因为你是多了一层额外的抽象,所以有更多的可能引起bug:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;是否基础工具出错了?&lt;/li&gt;
+  &lt;li&gt;是否Grunt/Gulp插件出错了?&lt;/li&gt;
+  &lt;li&gt;是否我的配置错了?&lt;/li&gt;
+  &lt;li&gt;我是不是用了不兼容的版本?&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;使用npm scripts不会出现问题2,并且我发现问题3也很少出现,因为我一般直接调用工具的命令行借口.另外,我直接使用npm,减少了项目中使用到的package,问题4也出现的较少.&lt;/p&gt;
+
+&lt;h4 id=&quot;section-3&quot;&gt;问题3:杂乱的文档&lt;/h4&gt;
+&lt;p&gt;我需要的npm core tools文档几乎总是比相应的Grunt和Gulp插件文档好.例如,我使用gulp-eslint时,我要花费很多时间在gulp-eslint文档和ESLint网站间来回切换.用Gulp和Grunt主要的痛点就是:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;了解了工具是不够的,还需要你了解这个工具对应Gulp和Grunt的插件的使用&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;大多构建相关的工具提供了清晰,强大和具有完善文档的命令行接口.看一下&lt;a href=&quot;http://eslint.org/docs/user-guide/command-line-interface&quot;&gt;docs on ESLint’s CLI&lt;/a&gt;,就是一个很好的例子.我发现在npm scripts中阅读并且实现一个简短的命令行调用会更清晰,更直接,并且更容易调试(因为没有了一层抽象).&lt;/p&gt;
+
+&lt;p&gt;现在我已经列出了所有痛点,问题是,为什么我们认为我们需要像Gulp和Grunt之类的任务执行器.&lt;/p&gt;
+
+&lt;h3 id=&quot;npm&quot;&gt;为什么我们忽略了npm的构建功能&lt;/h3&gt;
+
+&lt;p&gt;我相信Gulp和Grunt这么流行是因为四个误解:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;人们认为npm scripts需要很好的掌握命令行的编写&lt;/li&gt;
+  &lt;li&gt;人们认为npm scripts不够强大&lt;/li&gt;
+  &lt;li&gt;人们认为Gulp的流处理对快速构建是必不可少的&lt;/li&gt;
+  &lt;li&gt;人们认为npm scripts不能跨平台&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;让我们对这四个误解一个个的说明:&lt;/p&gt;
+
+&lt;h4 id=&quot;npm-scripts&quot;&gt;误解1:npm scripts需要很好的掌握命令行的编写&lt;/h4&gt;
+&lt;p&gt;要享受使用npm scripts的快感,你不需要掌握很多有关操作系统的命令行.当然,grep,sed,awk和pipe是值得学习的终身受用的技能,但要使用npm scripts你也不用成为Unix或者Windows命令行大师.你也可以使用npm文档中的一千多个脚本来完成工作.&lt;/p&gt;
+
+&lt;p&gt;例如,你可能不知道在Unix下这样会删除一个目录:rm -rf.这没有关系,你可以用&lt;a href=&quot;https://www.npmjs.com/package/rimraf&quot;&gt;rimraf&lt;/a&gt;,它的作用是一样的,而且是跨平台的.很多npm包提供的接口,即使没有掌握系统命令行也是很方便使用的.只需要搜索一下你需要的npm包,读一下文档学一下.我之前都是搜索Gulp插件,现在我搜索npm包.顺便提供一个不错的资源:&lt;a href=&quot;https://libraries.io/&quot;&gt;libraries.io&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;npm-scripts-1&quot;&gt;误解2:npm scripts不够强大&lt;/h4&gt;
+&lt;p&gt;npm scripts其实是很强大的!有一份基于&lt;a href=&quot;https://docs.npmjs.com/misc/scripts#description&quot;&gt;pre and post hooks&lt;/a&gt;的约定:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &quot;name&quot;: &quot;npm-scripts-example&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;description&quot;: &quot;npm scripts example&quot;,
+  &quot;scripts&quot;: {
+    &quot;prebuild&quot;: &quot;echo I run before the build script&quot;,
+    &quot;build&quot;: &quot;cross-env NODE_ENV=production webpack&quot;,
+    &quot;postbuild&quot;: &quot;echo I run after the build script&quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;你所需要做的就是遵循约定.上面的脚本会根据前缀按顺序执行.prebuild脚本会在build脚本之前执行,它对比build脚本有前缀”pre”,而post脚本会在build脚本后面执行因为有前缀”post”.所以如果我创建了脚本:prebuild,build和postbuild,当我输入”npm run build”时,它们将会自动按顺序执行.&lt;/p&gt;
+
+&lt;p&gt;你也可以通过调用另一个脚本,把一个大任务拆分:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &quot;name&quot;: &quot;npm-scripts-example&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;description&quot;: &quot;npm scripts example&quot;,
+  &quot;scripts&quot;: {
+    &quot;clean&quot;: &quot;rimraf ./dist &amp;amp;&amp;amp; mkdir dist&quot;,
+    &quot;prebuild&quot;: &quot;npm run clean&quot;,
+    &quot;build&quot;: &quot;cross-env NODE_ENV=production webpack&quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上面的例子prebuild任务调用了clean任务.这允许你把你的脚本拆分成更小,更好命名,更加单一职责的一行代码.&lt;/p&gt;
+
+&lt;p&gt;你也可以在一行脚本用&amp;amp;&amp;amp;串行调用多个脚本.上面例子的clean任务,将会顺序执行各个脚本.如果你是一个讨厌Gulp中一长串任务写法的人,这种简单会让你做梦都笑的.&lt;/p&gt;
+
+&lt;p&gt;并且如果一个命令变得太复杂了,你也可以调用其他的文件:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &quot;name&quot;: &quot;npm-scripts-example&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;description&quot;: &quot;npm scripts example&quot;,
+  &quot;scripts&quot;: {
+    &quot;build&quot;: &quot;node build.js&quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上面的例子我在build任务中调用了一个其他文件的脚本.这个脚本会用node执行因此可以调用任何我需要的npm包,并且可以使用到javascript的强大力量!&lt;/p&gt;
+
+&lt;p&gt;我就不继续说了,&lt;a href=&quot;https://docs.npmjs.com/misc/scripts&quot;&gt;主要的特性都在这里&lt;/a&gt;.并且,这里还有一个&lt;a href=&quot;https://www.pluralsight.com/courses/npm-build-tool-introduction&quot;&gt;npm作为构建工具的简短介绍&lt;/a&gt;,或者查看&lt;a href=&quot;https://github.com/coryhouse/react-slingshot&quot;&gt;React Slingshot&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h4 id=&quot;gulp&quot;&gt;误解3:快速构建一定要用到Gulp的流&lt;/h4&gt;
+&lt;p&gt;Gulp能够快速获得超过Grunt支持的一个原因就是其基于内存操作的stream操作要比Grunt的文件操作要快.但其实要使用stream的力量你完全可以不用Gulp.事实上,使用Unix和Windows的命令行,我们就经常会使用到stream.pipe操作符(|)使一个命令的输出以流的形式作为另一个命令的输入.而重定向操作符(&amp;gt;)将输出定向到一个文件.&lt;/p&gt;
+
+&lt;p&gt;例如,在Unix我可以用’grep’检索一个文件的内容并且输出到一个新的文件:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;grep ‘Cory House’ bigFile.txt &amp;gt; linesThatHaveMyName.txt
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上面所做的就是流,没有中间的文件被写.(想知道上面的命令怎么跨平台使用吗?那继续读下去…)&lt;/p&gt;
+
+&lt;p&gt;在Unix上,你也可以用’&amp;amp;’操作符来同时跑两条命令:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;npm run script1.js &amp;amp; npm run script2.js
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上面两个脚本将在同一时间执行,想要同时跨平台,使用&lt;a href=&quot;https://www.npmjs.com/package/npm-run-all&quot;&gt;npm-run-all&lt;/a&gt;.这引出了我们的下一个误解…&lt;/p&gt;
+
+&lt;h4 id=&quot;npm-1&quot;&gt;误解4:npm脚本不能跨平台执行&lt;/h4&gt;
+&lt;p&gt;很多项目都是在特定的操作系统使用，所以没有跨平台的忧虑。但如果你需要跨平台，npm脚本也能够很好的工作。无数的开源项目就是证明。下面说明是怎么做到的。&lt;/p&gt;
+
+&lt;p&gt;你的操作系统命令行执行了npm脚本，所以在Linux和OSX你的npm脚本通过Unix命令行执行。而Windows上，npm脚本通过Windows命令行执行。因此，如果你要你的构建脚本可以在所有平台上执行，你要让Unix和Windows都开心。下面是3个方法：&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;方法1:&lt;/strong&gt; 使用跨平台的命令，很幸运的是竟然有如此多的跨平台命令，以下是其中一些：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&amp;amp;&amp;amp; chain tasks (Run one task after another)&lt;/li&gt;
+  &lt;li&gt;&amp;lt; input file contents to a command&lt;/li&gt;
+  &lt;li&gt;&amp;gt; redirect command output to a file&lt;/li&gt;
+  &lt;li&gt;| redirect command output to another command&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;方法2:&lt;/strong&gt; 使用node packages。你可以使用node packages取代shell命令。例如，使用&lt;a href=&quot;https://www.npmjs.com/package/rimraf&quot;&gt;rimraf&lt;/a&gt;取代“rm -rf”。使用&lt;a href=&quot;https://www.npmjs.com/package/cross-env&quot;&gt;cross-env&lt;/a&gt;来跨平台设置环境变量。在Google，npm或者&lt;a href=&quot;https://libraries.io/&quot;&gt;lirbraries.io&lt;/a&gt;上搜索你所需要的node package，一般都能找到一个可以跨平台的。另外，如果你的命令行调用过长，你可以用分离的脚本调用node packages，像这样：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;node scriptName.js
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上面是一个用node跑的简单脚本。如果你仅仅是想用命令行调用一个脚本，你可以不使用.js文件。你可以在你的系统上使用Bash，Python，Ruby，或者Powerell执行任意脚本。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;方法3:&lt;/strong&gt; 使用&lt;a href=&quot;https://www.npmjs.com/package/shelljs&quot;&gt;ShellJS&lt;/a&gt;.ShellJS是一个通过node执行Unix命令行的npm包。所以这可以让你在任何平台上面执行Unix命令，包括Windows。&lt;/p&gt;
+
+&lt;p&gt;我在&lt;a href=&quot;https://github.com/coryhouse/react-slingshot&quot;&gt;react slingshot&lt;/a&gt;使用了方法1和方法2&lt;/p&gt;
+
+&lt;h3 id=&quot;section-4&quot;&gt;痛点&lt;/h3&gt;
+
+&lt;p&gt;不过不可否认的是也存在一些缺点：因为JSON不能添加注释，所以在package.json里不能添加注释。有几个方法可以用来处理这个限制：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;脚本写得简洁、单一职责并且命名规范&lt;/li&gt;
+  &lt;li&gt;脚本文档分离（例如写在readme上）&lt;/li&gt;
+  &lt;li&gt;调用一个separate.js文件&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;我更倾向于第一种。如果你分离好脚本使各脚本单一职责，注释是可以不要的。脚本的名字应该描述其目的，就像那些命名规范的小函数。正如我在&lt;a href=&quot;https://www.pluralsight.com/courses/writing-clean-code-humans&quot;&gt;Clean Code: Writing Code for Humans&lt;/a&gt;中讨论的，单一职责的小函数是不需要注释的。如果我觉得注释是必须的，我会使用方法3，把脚本迁移到一个分离的文件。把&lt;a href=&quot;https://github.com/kriasoft/react-starter-kit/blob/master/package.json#L74&quot;&gt;React-starter-kit&lt;/a&gt;check out下来查看一个简单的例子。&lt;/p&gt;
+
+&lt;p&gt;总之，仍然会有可能创建让人很难看懂的又长又臭的命令行参数。而确保npm脚本分离成简洁、单一职责并且命名规范容易理解的小功能，代码审查和不断的重构是一个不错的方法。而如果脚本复杂到真的需要注释，你应该把单一的脚本分离成多个命名规范的脚本，或者抽离到分离的文件。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-5&quot;&gt;抽象要恰当&lt;/h4&gt;
+
+&lt;p&gt;Gulp和Grunt都是我使用过的抽象工具。抽象是有用的，但是也有代价。它们让我们依赖于插件的维护者和文档，并且越来越多的依赖使他们更复杂。我已经觉得我不再需要Gulp和Grunt这样的任务执行器了。&lt;/p&gt;
+
+&lt;p&gt;我不是第一个这样建议的人了，下面是一些不错的文章：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://substack.net/task_automation_with_npm_run&quot;&gt;Task automation with npm run — James Holliday&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=0RYETb9YVrk&quot;&gt;Advanced front-end automation with npm scripts&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://blog.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool/&quot;&gt;How to use npm as a build tool &lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://app.pluralsight.com/courses/npm-build-tool-introduction&quot;&gt;Introduction to npm as a Build Tool &lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://gon.to/2015/02/26/gulp-is-awesome-but-do-we-really-need-it/&quot;&gt;Gulp is awesome, but do we really need it?&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://code.tutsplus.com/courses/npm-scripts-for-build-tooling&quot;&gt;NPM Scripts for Build Tooling&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+</description>
+        <pubDate>Thu, 28 Jan 2016 00:00:00 +0800</pubDate>
+      </item>
+    
+      <item>
+        <title>chrome文本高亮笔记插件</title>
+        <link>http://blog.plusice.net/2016/01/27/chrome-highlighter.html</link>
+        <guid isPermaLink="true">http://blog.plusice.net/2016/01/27/chrome-highlighter.html</guid>
+        <description>&lt;p&gt;好久没有写点东西了,最近天冷也懒了点.但不能就这么荒废了,安利一下前阵子写的一个chrome小插件&lt;/p&gt;
+
+&lt;h4 id=&quot;section&quot;&gt;介绍&lt;/h4&gt;
+
+&lt;p&gt;使用evernote剪藏的时候发现并不是很好用,每次保存都会新建一个文章进行保存,而我的使用场景是,看到一段想保存的文字,选择保存,然后保存到同一个地方.因为剪藏不能满足,所以写了一个小插件.插件可对文本进行高亮,并且高亮的文本会保存到插件的弹出窗口中,使用者可进行编辑.效果可以看我github介绍:&lt;a href=&quot;https://github.com/plusice/simple_note&quot;&gt;点击跳转&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;section-1&quot;&gt;实现&lt;/h4&gt;
+
+&lt;p&gt;实现也相对比较简单.被选择文本内容,通过监听chrome.contextMenus点击,在处理事件的时候可直接获取.需要做的主要就是对选择的文本进行高亮.&lt;/p&gt;
+
+&lt;p&gt;文本的高亮通过插入标签,给标签设置颜色实现.所以主要任务变成识别选择的页面内容,然后插入标签,这个可以使用Range对象实现,Range对象可以获取到文本start端和end端的文本节点.基本的思路就是,获取选择文本的Range对象,然后根据对象获取到文本start端的节点,然后给节点添加标签,将节点内容从选择内容剔除,再从新的内容的start端进行同样操作,直到start端节点等于end端节点.当然其中也有一些问题需要处理,不过基本也就是这些了.&lt;/p&gt;
+
+&lt;h4 id=&quot;section-2&quot;&gt;2016年展望&lt;/h4&gt;
+
+&lt;p&gt;健健康康就好了~&lt;/p&gt;
+</description>
+        <pubDate>Wed, 27 Jan 2016 00:00:00 +0800</pubDate>
+      </item>
+    
+      <item>
+        <title>angular2初试</title>
+        <link>http://blog.plusice.net/2015/11/30/angular2%E5%88%9D%E8%AF%95.html</link>
+        <guid isPermaLink="true">http://blog.plusice.net/2015/11/30/angular2%E5%88%9D%E8%AF%95.html</guid>
+        <description>&lt;p&gt;很久很久以前，就总是听人们在讨论着angular2（以下简称ng2，angualr1.x简称ng1），而今其beta版本已发布了好几个月，最近刚好有时间于是拿来试玩一下。&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;一.初代和二代的简单对比&lt;/h3&gt;
+
+&lt;p&gt;据说ng2是不兼容ng1的，有这么几点很大的不同：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;使用TypeScript编写&lt;/li&gt;
+  &lt;li&gt;没有Controllers&lt;/li&gt;
+  &lt;li&gt;没有双向数据绑定，不过ng2提供了强大的forms module提供类似功能&lt;/li&gt;
+  &lt;li&gt;组件化&lt;/li&gt;
+  &lt;li&gt;新的Router&lt;/li&gt;
+  &lt;li&gt;模块化&lt;/li&gt;
+  &lt;li&gt;没有$scope&lt;/li&gt;
+  &lt;li&gt;使用Tempate的错误提示&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;所以剩下没变的，好像也就filters了。那为什么做这么大改变呢，ng2团队给出了解释，下面简单列一下：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;性能限制&lt;/strong&gt;：双向绑定和模板等性能问题&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;前端的快速发展&lt;/strong&gt;：ES6标准的确定，组件化模块化的发展&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;移动端的需求&lt;/strong&gt;：移动端要求的高性能ng1满足不了&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;易用性&lt;/strong&gt;：ng1太复杂学习曲线太陡峭&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;我对性能方面的考虑倒没那么多，而如果用在手机端可能也会先考虑reactjs。但是使用过ng2后，它的模块化组件化着实让我眼前一亮！和ng1那种糟糕的写法比起来简直就是：完美～！&lt;/p&gt;
+
+&lt;h3 id=&quot;angular2&quot;&gt;二.angular2代码怎么写&lt;/h3&gt;
+
+&lt;p&gt;angular2可以使用ejs5，ejs6或typescript进行开发。ejs5的话就别用了，使用ejs6/typescript才能使ng2的模块化组件化代码更加漂亮，兼容问题在浏览器端把代码编译成ejs5即可。因为ejs6标准还不支持decorator，编译配置稍微麻烦一点，这里参考官网typescript版的&lt;a href=&quot;https://angular.io/docs/ts/latest/quickstart.html&quot; target=&quot;_blank&quot;&gt;quik-start&lt;/a&gt;例子，简单介绍一下，详细内容可参照官网。&lt;/p&gt;
+
+&lt;p&gt;按照quik-start，构建一个ng2应用非常简单，我们新建一个app.ts，然后按下面三步写入代码：&lt;/p&gt;
+
+&lt;h4 id=&quot;angular2-1&quot;&gt;1.从angular2模块引入依赖&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;import {bootstrap, Component} from &#39;angular2/angular2&#39;;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;import在typescript中可以从其他模块引入方法/对象等依赖，这里我们引入了bootstrap方法和Component类。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-1&quot;&gt;2.编写一个组件&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;@Component({
+    selector: &#39;my-app&#39;,
+    template: &#39;&amp;lt;h1&amp;gt;My First Angular  App&amp;lt;/h1&amp;gt;&#39;
+})
+class AppComponent {
+    public version = 2;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;class用于定义一个类，这里定义了一个AppComponent类，而@Component对类进行注解（annotation），告诉ng2这是一个component，也就是一个组件，并且组件将会渲染到my-app元素，而渲染的模板就是template指定的内容。annotation的详细内容可自行谷歌，这里你只要知道AppComponent经过注解后就变成了一个ng2组件。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-2&quot;&gt;3. 初始化应用&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;bootstrap(AppComponent);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;bootstrap方法告诉ng2用AppComponent组件初始化应用。方法执行后组件就会被渲染到dom上了。&lt;/p&gt;
+
+&lt;hr /&gt;
+&lt;p&gt;就看这么一个简单的例子，是不是就被吸引了呢，我反正是被吸引了。想想以前ng1的代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;angular.module(&#39;myapp&#39;, [&#39;mymodule&#39;])
+    .controller(&#39;myctrl&#39;, function($scope, $xxx) {
+
+        $scope.xxx = &#39;&#39;;
+        $scope.xxxx = &#39;&#39;;
+        ...
+
+});
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;太多$scope什么的看了很烦啊，依赖的mymodule和$xxx从哪来的我不知道啊,什么，哪块地方忘了调$digest()视图好像没更新啊。使用ng2一切都清晰了好多。(这里只是写出一个ng1的controller，所以其实也没那么难看)&lt;/p&gt;
+
+&lt;p&gt;不过到这里还不能看到效果，我们还需要一个页面，但是浏览器端不能执行typescript啊，模块化的那套也没有实现啊，这时候一些附加的工具派上用场了。先提供我在官网上抄下来的代码&lt;a href=&quot;https://github.com/plusice/angular2-helloworld/tree/v1.1&quot; target=&quot;_blank&quot;&gt;angular2-helloworld&lt;/a&gt;，需要用的可以clone下来，共有三个tag。&lt;/p&gt;
+
+&lt;h3 id=&quot;angular2-2&quot;&gt;三.一个angular2应用的基本架构&lt;/h3&gt;
+&lt;p&gt;要跑通一个ag2应用，有一个app.ts文件是远远还不够的，我们需要把代码编译成浏览器支持的代码，并且支持模块化。如果是使用es6也是类似，因为现在大部分浏览器都还不支持es6标准，es6也还不支持annotation/decorator。我们还是以typescript为例，先看一下在浏览器端对代码进行处理的方法，这种方法我们只需要在页面引入一些小脚本（es6-shim.js需要安装）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;html&amp;gt;
+    &amp;lt;head&amp;gt;
+        &amp;lt;title&amp;gt;Angular 2 QuickStart&amp;lt;/title&amp;gt;
+        &amp;lt;!-- Angular 2 requires ES6 support --&amp;gt;
+        &amp;lt;script src=&quot;node_modules/es6-shim/es6-shim.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;!-- System.js is the module loader, a tool that can import code --&amp;gt;
+        &amp;lt;script src=&quot;https://code.angularjs.org/tools/system.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;!-- compile typescript --&amp;gt;
+        &amp;lt;script src=&quot;https://code.angularjs.org/tools/typescript.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;script src=&quot;https://code.angularjs.org/2.0.0-alpha.44/angular2.dev.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;script&amp;gt;
+          // System compiles typescript to javascript,depends on typescript.js
+          System.config({
+              transpiler: &#39;typescript&#39;,
+              typescriptOptions: {
+                  emitDecoratorMetadata: true
+              }
+          });
+          System.import(&#39;./app.ts&#39;);
+        &amp;lt;/script&amp;gt;
+    &amp;lt;/head&amp;gt;
+
+    &amp;lt;body&amp;gt;
+        &amp;lt;my-app&amp;gt;loading...&amp;lt;/my-app&amp;gt;
+    &amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;新建一个目录，放置好目前完成的两个文件，npm install live-server es6-shim，开启服务器就可以看到页面拉！&lt;a href=&quot;https://github.com/plusice/angular2-helloworld/tree/v1.1&quot; target=&quot;_blank&quot;&gt;angular2-helloworld&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;从注释我们应该都已经知道各个脚本的功能了。这里最重要的就是System.js这个库。它时angular官网使用的模块管理器，实现了对angular的模块管理，并且可调用typescript.js对相关typescript代码模块进行编译加载，需要知道的是angular2.dev.js中调用了System.js接口存储了“angular2/angular2”模块，如果没有做这一步，在app.ts中import必须指定到具体路径，后缀也不能省略，类似seajs。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;另外一种方法&lt;/strong&gt;，我们可以在生产环境编译typescript，然后浏览器访问编译后的代码，实际应用中肯定是选择这种方法。这种方法我们需要安装typescript，编写编译配置文件，对typescript文件进行编译。所以页面也就不需要引用typescript.js了。而且System.js配置需要做些更改：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// 下面配置了脚本使用js
+System.config({
+    packages: {&#39;app&#39;: {defaultExtension: &#39;js&#39;}}
+});
+System.import(&#39;app/app&#39;);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;代码可参考：&lt;a href=&quot;https://github.com/plusice/angular2-helloworld/tree/v1.2&quot; target=&quot;_blank&quot;&gt;angular2-helloworld&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;由demo我们可以得出ng2的一个简单架构（typescript版）：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/resource/ng2_framework.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;通过System.js进行模块管理，包括ng2和应用模块，应用模块使用typescript编写，但是最终会编译成es5代码，最后这些模块（angular组件）和angular2与视图进行交互。而当浏览器支持es6后，可以把图中System.js和typescript两块除去，这时候浏览器充当了模块管理器，脚本也不用再编译了。&lt;br /&gt;
+当然，这只是一个简单的架构，实际应用起来不会这么简单，例如System.js的模块还需要用jspm进行管理，关于System.js+jspm的内容可以多写一篇很长的博客了。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;四.最后的感慨&lt;/h3&gt;
+
+&lt;p&gt;前端发展实在太快了，各种框架各种工具层出不穷，要努力保持学习的状态！也要敢于挑战和使用新的技术，特别是在实际项目中！不过angular2现在还未发布正式版本，所以只能先做了解而已。如果对这种模块化组件化思想有兴趣的，可以尝试一下webpack+vue.js，我对此还未做过实践，不知道效果如何。另外框架的使用还是要结合项目，不要一味追求潮流，按照前端现在的发展，可能追不上潮流还会被挫败得一身伤。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-4&quot;&gt;参考链接：&lt;/h4&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;a href=&quot;http://blog.mgechev.com/2015/04/06/angular2-first-impressions/&quot;&gt;ng1和ng2区别&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&quot;http://blog.thoughtram.io/angular/2015/05/03/the-difference-between-annotations-and-decorators.html&quot;&gt;annotation和decorator区别&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&quot;https://angular.io/docs/ts/latest/quickstart.html#es6support&quot;&gt;官网demo&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+        <pubDate>Mon, 30 Nov 2015 00:00:00 +0800</pubDate>
+      </item>
+    
+      <item>
+        <title>html渲染奥秘</title>
+        <link>http://blog.plusice.net/2015/11/11/html%E6%B8%B2%E6%9F%93%E5%A5%A5%E7%A7%98.html</link>
+        <guid isPermaLink="true">http://blog.plusice.net/2015/11/11/html%E6%B8%B2%E6%9F%93%E5%A5%A5%E7%A7%98.html</guid>
+        <description>&lt;p&gt;在html5流行泛滥的今天,作为一个web前端,你应该已经写过了无数的动画效果,你或许也在你的css3动画中加上了translate3d,使得动画流畅,但究竟这个为什么能使动画流畅呢,还有其他的东西能影响到动画的性能,或者说网页渲染的性能呢?&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;下面的内容将介绍页面渲染过程对性能是如何影响性能的:&lt;/b&gt;&lt;br /&gt;
+&lt;em&gt;内容基于 WebKit，更准确的说，是 WebKit 的 Chromium 分支,不过其他浏览器大体一致&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;html&quot;&gt;一.一个html文档,从解析到屏幕&lt;/h3&gt;
+
+&lt;p&gt;一个html文档从解析到渲染到屏幕,大致上有以下几步:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;html文档生成DOM树&lt;/li&gt;
+  &lt;li&gt;CSS代码转化成CSSOM&lt;/li&gt;
+  &lt;li&gt;DOM+CSSOM生成渲染树&lt;/li&gt;
+  &lt;li&gt;根据渲染树上节点的位置大小等信息进行布局(layout)&lt;/li&gt;
+  &lt;li&gt;将布局绘制到bitmap上&lt;/li&gt;
+  &lt;li&gt;bitmap传输至GPU然后绘制到屏幕&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;这个过程我们可以用chrome开发者工具清楚的看到:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;img src=&quot;/img/resource/parsehtml.png&quot; alt=&quot;图1&quot; /&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;不过注意想要看到上图所示的瀑布流,需要取消帧模式和事件模式:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;img src=&quot;/img/resource/tooltip.png&quot; alt=&quot;图2&quot; /&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;浏览器所做的这些操作都要耗费时间,所以做的越少,性能越好,前3步我们是没办法做改变的.但页面解析完毕呈现在屏幕上后,后面的3个操作会因为某些操作而被触发,例如动画,而且触发越靠前的操作,浏览器需要做的越多,因为一旦触发一个步骤,后面的步骤都要再做一遍.因此我们可以做的就是从后面三个步骤入手,优化页面的性能.&lt;/p&gt;
+
+&lt;h3 id=&quot;layoutpaintcomposite&quot;&gt;二.layout,paint,composite&lt;/h3&gt;
+
+&lt;p&gt;我们首先得了解layout,paint,composite的触发条件有哪些&lt;/p&gt;
+
+&lt;h5 id=&quot;layout&quot;&gt;layout&lt;/h5&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;改变width/height/padding/margin/left/top等有关位置和大小的空间样式&lt;br /&gt;
+改变上面的样式后,再读取offsetTop/scrollTop/clientTop等位置大小信息&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h5 id=&quot;paint&quot;&gt;paint&lt;/h5&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;改变color/box-shadow/background/outline等有关表现的样式&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h5 id=&quot;composite&quot;&gt;composite&lt;/h5&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;改变opacity/z-index等&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;所以,要提高网页渲染性能,我们首先可以尽量减少这些触发条件的出现,即使出现,也要尽量降低触发频率.现代浏览器会只能得将元素样式变动尽量一次执行,减少重复渲染.但是,如果我们像下面这样写,就会出现重复重排:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;div.style.left = div.offsetLeft + 10 + &quot;px&quot;;
+div.style.top = div.offsetTop + 10 + &quot;px&quot;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上面代码第一行对div.style.left进行改变,后续进行一次读操作触发一次重排以获取最新offsetTop,最后再改变div.style.top,触发又一次重排&lt;br /&gt;
+所以我们要尽量将读写操作写在一起:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var left = div.offsetLeft;
+var top  = div.offsetTop;
+div.style.left = left + 10 + &quot;px&quot;;
+div.style.top = top + 10 + &quot;px&quot;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;那么,我们还有其他方法吗,例如采用不触发layout和paint的方法.答案是可以的,那就是利用硬件加速.&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;三.硬件加速&lt;/h3&gt;
+
+&lt;p&gt;所谓的硬件加速,就是通过生成一个特殊的GraphicsLayer层,让元素的渲染都在层中进行,而对元素的某些css操作并不会引起重排或重绘,这些css操作主要是transform等css3变换.硬件加速主要也应用在相关的css3动画中.&lt;/p&gt;
+
+&lt;p&gt;其原理是:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;dom解析时在某些条件下生成GraphicsLayer,每个层将独立的绘制进bitmap中&lt;/li&gt;
+  &lt;li&gt;bitmap传输到GPU作为texture渲染,并存储起来&lt;/li&gt;
+  &lt;li&gt;特定css属性的变化,可以让层不用重新paint,而直接通过GPU中的textrue进行重新复合生成最终的屏幕图像,达到加速目的&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;从上面我们可以得知,加速的奥秘就在于不必让CPU进行重绘或重排,而将工作分配给了GPU;并且没有了重绘,bitmap传输到GPU的步骤也节省了.&lt;br /&gt;
+而触发GraphicsLayer生成的条件之一就是使用translate3d,具体来说有以下一些条件:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;3D 或透视变换(perspective transform) CSS 属性&lt;/li&gt;
+  &lt;li&gt;使用加速视频解码的 video 元素&lt;/li&gt;
+  &lt;li&gt;拥有 3D (WebGL) 上下文或加速的 2D 上下文的 canvas 元素&lt;/li&gt;
+  &lt;li&gt;混合插件(如 Flash)&lt;/li&gt;
+  &lt;li&gt;对自己的 opacity 做 CSS 动画或使用一个动画 webkit 变换的元素&lt;/li&gt;
+  &lt;li&gt;拥有加速 CSS 过滤器的元素&lt;/li&gt;
+  &lt;li&gt;元素有一个包含复合层的后代节点(换句话说，就是一个元素拥有一个子元素，该子元素在自己的层里)&lt;/li&gt;
+  &lt;li&gt;元素有一个 z-index 较低且包含一个复合层的兄弟元素(换句话说就是该元素在复合层上面渲染)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;em&gt;注意的是,硬件加速不能滥用,上面所说的z-index较低的触发条件就可能是一个坑,参见:&lt;a href=&quot;http://div.io/topic/1348&quot; target=&quot;_blank&quot;&gt;大神分享&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;以上是文章全部内容&lt;br /&gt;
+参考连接:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;http://melonh.com/sharing/slides.html?file=high_performance_animation#/&lt;br /&gt;
+http://www.html5rocks.com/zh/tutorials/speed/high-performance-animations/&lt;br /&gt;
+http://www.ruanyifeng.com/blog/2015/09/web-page-performance-in-depth.html&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+        <pubDate>Wed, 11 Nov 2015 00:00:00 +0800</pubDate>
+      </item>
+    
+      <item>
+        <title>从inline-block到line-height到vertical-align</title>
+        <link>http://blog.plusice.net/2015/08/21/inline-block.html</link>
+        <guid isPermaLink="true">http://blog.plusice.net/2015/08/21/inline-block.html</guid>
+        <description>&lt;p&gt;    又有东西可以写的,为何又是样式相关的,其实我很想写点其他的啊啊啊.&lt;br /&gt;
+    最近做公司招聘网站被设计给虐惨了,一方面是设计太年轻太严谨了,一方面自己做的也不好,好一些图标的垂直对齐都用像素调整,导致被设计师贼亮的眼睛发现好多个一两个像素的差距,最终导致我需要改动好多.之前以为vertical-align效果不同浏览器会有差异所以没怎么用,但现在我已追悔莫及~~让我先从inline-block讲起吧&lt;/p&gt;
+
+&lt;h3 id=&quot;inline-block&quot;&gt;inline-block&lt;/h3&gt;
+
+&lt;p&gt;    一些line box什么的就不说了,直接切入问题.举一个栗子可能很多人都遇到类似情况:一个div大小为20px,里面两个inline-block元素,一个不含文本,宽度高度均20px,另一个line-height为20px,包含文本,然后我们会发现div容器是不止20px高的&lt;a href=&quot;#eg-link&quot;&gt;看例1&lt;/a&gt;.&lt;br /&gt;
+    这是什么原因呢,其实是inline-block元素的垂直对齐引起的.inline box垂直方向上默认是与其baseline对齐的，而它的baseline又是和包裹它的line box的baseline对齐的。而当一个inline box里面没有包含文本的时候，没有了baseline，没有基准可以对齐,所以定了一个妥协的规则，就是把该box的底部对准包裹它的line box的baseline。而baseline又是在文本的底线上面的,所以整体会把容器给撑高了.&lt;br /&gt;
+    那么问题来了,linebox的baseline又是怎么定的呢,很简单,它包裹的带文本的所有inline box,高度最高的那个的baesline就是linebox的baesline,当然这个高度不是指盒子高度,而是指inline box的line-height撑高的高度.这里要注意的是,多行文本的inline box的baseline是以最后一行为基准的&lt;a href=&quot;#eg-link&quot;&gt;看例2&lt;/a&gt;.而如果没有包含文本,就是以自身给定的line-height来决定&lt;a href=&quot;#eg-link&quot;&gt;看例3&lt;/a&gt;.最后,如果包含文本,本身也设置了line-height,那就哪个高听哪个.&lt;/p&gt;
+
+&lt;h3 id=&quot;line-height&quot;&gt;line-height&lt;/h3&gt;
+
+&lt;p&gt;    再来看看line-height,我还是搬砖就行吧:&lt;a href=&quot;http://www.zhangxinxu.com/wordpress/2009/11/css%E8%A1%8C%E9%AB%98line-height%E7%9A%84%E4%B8%80%E4%BA%9B%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E5%8F%8A%E5%BA%94%E7%94%A8/&quot;&gt;戳我&lt;/a&gt;&lt;br /&gt;
+    总结为一句:line-height撑高容器而不是文字撑高容器,line-height垂直平分线始终与文字的垂直平分线重合。&lt;/p&gt;
+
+&lt;h3 id=&quot;vertical-align&quot;&gt;vertical-align&lt;/h3&gt;
+
+&lt;p&gt;    再来看看vertical-align,我还也是搬砖就行吧:&lt;a href=&quot;http://www.zhangxinxu.com/wordpress/2010/05/%E6%88%91%E5%AF%B9css-vertical-align%E7%9A%84%E4%B8%80%E4%BA%9B%E7%90%86%E8%A7%A3%E4%B8%8E%E8%AE%A4%E8%AF%86%EF%BC%88%E4%B8%80%EF%BC%89/&quot;&gt;戳我&lt;/a&gt;&lt;br /&gt;
+    总结为两句:vertical-align只对inline或inline-block元素有效，~~是相对于父元素的line-height垂直对齐~~,实验发现是子元素竖直方向中点与父元素font-size值对应的base-line对齐。vertical-align:text-bottom是相对于父元素文本底部，vertical-align:bottom是相对于父元素line-height底部。&lt;br /&gt;
+    各个基线可以参考:&lt;br /&gt;
+&lt;img src=&quot;http://2.bp.blogspot.com/-sthQ7pdqw0k/UENQUh1ei-I/AAAAAAAAALk/jb1Ir8dAF6o/s400/Vertical%2BAlign_crop.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;    貌似有点虎头蛇尾了呢,但别人确实写的不错,就不重复造轮子咯.&lt;/p&gt;
+
+&lt;h4 id=&quot;a-hrefhttpjsfiddlenetplusicewg08hfmq2-ideg-linka&quot;&gt;&lt;a href=&quot;http://jsfiddle.net/plusice/wg08hfmq/2/&quot; id=&quot;eg-link&quot;&gt;栗子&lt;/a&gt;&lt;/h4&gt;
+
+&lt;hr /&gt;
+&lt;p&gt;(2015-08-31补充)&lt;br /&gt;
+今天发现css大神张鑫旭新写的一篇博客跟我这里内容类似,不过很详细,内容更多(虽然比较啰嗦哈哈):&lt;a href=&quot;http://www.zhangxinxu.com/wordpress/2015/08/css-deep-understand-vertical-align-and-line-height/&quot; id=&quot;eg-link&quot;&gt;戳我吧&lt;/a&gt;.文中的”基本现象衍生：垂直居中”让我顿悟.&lt;/p&gt;
+</description>
+        <pubDate>Fri, 21 Aug 2015 00:00:00 +0800</pubDate>
+      </item>
     
       <item>
         <title>CORS  options请求</title>
-        <link>http://blog.plusicec.com/2015/08/15/cors%E8%B7%A8%E5%9F%9Foptions%E8%AF%B7%E6%B1%82.html</link>
-        <guid isPermaLink="true">http://blog.plusicec.com/2015/08/15/cors%E8%B7%A8%E5%9F%9Foptions%E8%AF%B7%E6%B1%82.html</guid>
+        <link>http://blog.plusice.net/2015/08/15/cors%E8%B7%A8%E5%9F%9Foptions%E8%AF%B7%E6%B1%82.html</link>
+        <guid isPermaLink="true">http://blog.plusice.net/2015/08/15/cors%E8%B7%A8%E5%9F%9Foptions%E8%AF%B7%E6%B1%82.html</guid>
         <description>&lt;p&gt;      终于找到时间（不偷懒）来填三个星期前挖的坑了，虽然不是什么干货，但是通过写写文章，也可以增强自己的语言组织能力，这点对程序员后面的发展也是至关重要的。切入正题，这次记录以下我用cors跨域时失败的问题（不涉及cookie跨域）。&lt;/p&gt;
 
 &lt;p&gt;      前两周和一个后端在集成接口，因为前端代码在我本地，后端接口在他机子上，所以让他设置cors让我可以跨域访问。然而，结果却老是得到一个404请求，查看请求信息发现是发了一个options请求，而本来的请求都没有发出去。我当时就纳闷了，自己之前用nodejs试过后端Access-Control-Allow-Origin就行啦，为何这次就不行。然后试着用原生的ajax请求和jquery请求都可以哇。&lt;/p&gt;
 
 &lt;p&gt;      google了些许时间后才发现问题，我前端使用angualr写的，其他人的认证模块在请求里插入了自定义的头域，而这是cors请求出现options预请求的其中一种情况，当出现以下一种情况就会发出预请求（其他情况和正常请求一样）：&lt;/p&gt;
 
-&lt;blockquote&gt;
-  &lt;ul&gt;
-    &lt;li&gt;请求以 GET, HEAD 或者 POST 以外的方法发起请求。或者，使用 POST，但请求数据为 application/x-www-form-urlencoded, multipart/form-data 或者 text/plain 以外的数据类型。比如说，用 POST 发送数据类型为 application/xml 或者 text/xml 的 XML 数据的请求。&lt;/li&gt;
-    &lt;li&gt;使用自定义请求头（比如添加诸如 X-PINGOTHER）。&lt;/li&gt;
-  &lt;/ul&gt;
-&lt;/blockquote&gt;
+&lt;ul&gt;
+  &lt;li&gt;请求以 GET, HEAD 或者 POST 以外的方法发起请求。或者，使用 POST，但请求数据为 application/x-www-form-urlencoded, multipart/form-data 或者 text/plain 以外的数据类型。比如说，用 POST 发送数据类型为 application/xml 或者 text/xml 的 XML 数据的请求。&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;使用自定义请求头（比如添加诸如 X-PINGOTHER）。&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;提示：从Gecko 2.0开始，text/plain, application/x-www-form-urlencoded 和 multipart/form-data 类型的数据都可以直接用于跨站请求，而不需要先发起“预请求”了。之前，只有 text/plain 可以不用先发起“预请求”，进行跨站请求。
-&lt;/code&gt;&lt;/pre&gt;
+    &lt;p&gt;提示：从Gecko 2.0开始，text/plain, application/x-www-form-urlencoded 和 multipart/form-data 类型的数据都可以直接用于跨站请求，而不需要先发起“预请求”了。之前，只有 text/plain 可以不用先发起“预请求”，进行跨站请求。&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;      找到发起options请求的原因了，那为什么会404呢，原因也是非常简单，后端没处理。。。所以其实一切的一切都不是前端的问题，想允许跨域，后端对原始请求设置Access-Control-Allow-Origin响应头，对其预请求——options请求进行响应，并对options请求添加相关响应头即可：&lt;/p&gt;
 
@@ -53,8 +809,8 @@ Access-Control-Allow-Headers: X-PINGOTHER            // 允许跨域的自定义
     
       <item>
         <title>sass入门使用总结</title>
-        <link>http://blog.plusicec.com/2015/07/29/sass%E5%88%9D%E8%AF%95.html</link>
-        <guid isPermaLink="true">http://blog.plusicec.com/2015/07/29/sass%E5%88%9D%E8%AF%95.html</guid>
+        <link>http://blog.plusice.net/2015/07/29/sass%E5%88%9D%E8%AF%95.html</link>
+        <guid isPermaLink="true">http://blog.plusice.net/2015/07/29/sass%E5%88%9D%E8%AF%95.html</guid>
         <description>&lt;p&gt;      虽然sass出了很久了，但一直没有使用，因为在前公司没有使用编译工具，只有自己使用的话会怕导致不好维护（其实也是懒的借口）。&lt;/p&gt;
 
 &lt;p&gt;      最近公司的一个小项目，我开始了sass的使用。其实一开始用sass，我也是拒绝的，因为没有使用过，而项目稍微有点紧，怕不熟悉而影响进度。好吧，说来也惭愧，前端入坑已几年，竟然还没有用过这东西，哭！然而！使用之后duangduang的却发现，这玩意上手简直及其简单，可能也是我只是使用了比较简单的功能吧。之前试用过less，感觉还是又挺多东西要记的。话不多扯，下面自我总结一番sass的基本用法：&lt;/p&gt;
@@ -136,7 +892,7 @@ div {
 &lt;p&gt;      引入compass/animation后可以写成&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;div {
-    @include animation(test);       
+    @include animation(test);
 }
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -148,23 +904,23 @@ div {
     
       <item>
         <title>开篇——跳槽之路</title>
-        <link>http://blog.plusicec.com/2015/03/15/first-post.html</link>
-        <guid isPermaLink="true">http://blog.plusicec.com/2015/03/15/first-post.html</guid>
+        <link>http://blog.plusice.net/2015/03/15/first-post.html</link>
+        <guid isPermaLink="true">http://blog.plusice.net/2015/03/15/first-post.html</guid>
         <description>&lt;p&gt;      最近在忙着找下家，才知道了自己技术的匮乏。去年试了一下用jekyll在github pages写博客，但是一直没装扮好，现在倒是想抽空弄了一下。可惜windows下安装ruby实在蛋疼，只能复制了一个主题放了上去，这倒促使我想买mbp了。&lt;/p&gt;
 
-&lt;p&gt;2015-03-16&lt;br /&gt;
+&lt;p&gt;2015-03-16  &lt;br /&gt;
       今天得知投某易简历被拒了，mark一下。。。&lt;/p&gt;
 
-&lt;p&gt;2015-03-18&lt;br /&gt;
-      昨天下班回来竟然发现电脑坏了，开机都开不了。下楼买了一把螺丝刀，但可惜手机查方法有些麻烦，最后没能把笔记本拆开，因为不想浪费时间，今天只能跑去岗顶拿钱给别人赚了。昨晚因为这个还使得心情很差，一度很沮丧，本来回来想投下简历看下资料的，搞得都没干成。&lt;br /&gt;
+&lt;p&gt;2015-03-18  &lt;br /&gt;
+      昨天下班回来竟然发现电脑坏了，开机都开不了。下楼买了一把螺丝刀，但可惜手机查方法有些麻烦，最后没能把笔记本拆开，因为不想浪费时间，今天只能跑去岗顶拿钱给别人赚了。昨晚因为这个还使得心情很差，一度很沮丧，本来回来想投下简历看下资料的，搞得都没干成。  &lt;br /&gt;
       看来自己承受挫折的能力还是太差了。最近找下家也使得自己有些不自信，但真心找不到让自己自信的点，只能怪自己之前不够努力。有些迷茫，都有了想考公务员的想法，但不确定自己是否真的适合，最终还是放弃了这个想法。总之，自己选择的路，跪着也要把它走完吧。&lt;/p&gt;
 
-&lt;p&gt;2015-03-22&lt;br /&gt;
+&lt;p&gt;2015-03-22  &lt;br /&gt;
       又一周过去了，这周什么收获都没，上周怎么说也面试了两次，拿到一个offer，这周只投了一次简历，学习计划也还没完成。也是因为这周运气不好吧，周二电脑坏了一次，今天电脑又坏了，早上去跟同事借了u盘想重装系统，才发现原来不是系统问题，只能再拿去岗顶。一天又这么没了。唯一高兴的一点是今天刚好有同学去香港，已经帮我把mbp买到了。接下来，继续学习，继续加油！&lt;/p&gt;
 
-&lt;p&gt;2015-04-02&lt;br /&gt;
-      虽然没有找到理想的工作，但还是接受第二个offer吧，不想再拖下去了，定下来，好好干，不一定得是大公司才能学到东西，现在就更多大靠自己吧。&lt;br /&gt;
-      到现在为止，面试了3家，除了第一次面试某易状态不好挂掉外，拿到两个offer。但是投了好几个简历都没有消息，很受伤啊。。&lt;br /&gt;
+&lt;p&gt;2015-04-02  &lt;br /&gt;
+      虽然没有找到理想的工作，但还是接受第二个offer吧，不想再拖下去了，定下来，好好干，不一定得是大公司才能学到东西，现在就更多大靠自己吧。  &lt;br /&gt;
+      到现在为止，面试了3家，除了第一次面试某易状态不好挂掉外，拿到两个offer。但是投了好几个简历都没有消息，很受伤啊。。  &lt;br /&gt;
       现在总算把工作定下来，mbp也到手了，接下来要好好学习，记住这次跳槽所经历的鄙视。&lt;/p&gt;
 
 &lt;p&gt;      周末清明假期，和妹子去珠海澳门调整一下，回来努力工作学习！！&lt;/p&gt;
