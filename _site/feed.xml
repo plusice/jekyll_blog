@@ -5,7 +5,444 @@
     <atom:link href="http://blog.plusice.net/feed.xml" rel="self" type="application/rss+xml"/>
     <link>http://blog.plusice.net/</link>
     <description>A website with blog posts and pages</description>
-    <pubDate>Sun, 30 Oct 2016 21:08:27 +0800</pubDate>
+    <pubDate>Fri, 18 Nov 2016 00:39:54 +0800</pubDate>
+    
+      <item>
+        <title>［译］给Javascript开发者的Python指南</title>
+        <link>http://blog.plusice.net/2016/11/17/python-for-javascript-developer.html</link>
+        <guid isPermaLink="true">http://blog.plusice.net/2016/11/17/python-for-javascript-developer.html</guid>
+        <description>&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;原文：&lt;a href=&quot;https://mariopabon.com/2016/11/01/python-for-javascript-developers.html&quot;&gt;Python for JavaScript Developers&lt;/a&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;特别感谢&lt;a href=&quot;https://brett.is/&quot;&gt;Brett Langdon&lt;/a&gt;的认真检查&lt;/p&gt;
+
+&lt;p&gt;最近我开始在纽约一家创业公司工作，公司叫&lt;a href=&quot;https://underdog.io/&quot;&gt;Underdog.io&lt;/a&gt;，在那我发现他们后端主要是用Python写的，而这是我之前很少接触到的语言。&lt;/p&gt;
+
+&lt;p&gt;我是被雇来写JavaScript喝React的，这些在我的团队中只占了很少一部分，这意味着我经常得为了找到一些特性而钻进各个代码库中。所以我必须很快地了解Python。&lt;/p&gt;
+
+&lt;p&gt;不幸的是，我之前想找一些给写过代码的人看的Python教程找的好艰难。我已经知道怎么写代码了而且也熟悉其他语言，我只是需要学习Python这一特定语言的语法和规范。&lt;/p&gt;
+
+&lt;p&gt;这是我写这篇blog的原因。给Javascript开发者一个指南，可以快速地上手Python，而不用去学习声明一个变量的意思和方法是什么。&lt;/p&gt;
+
+&lt;p&gt;这篇log假设你在用Python 3.0.1，所以其中一些例子可能不能在旧版本的Python上跑。&lt;/p&gt;
+
+&lt;h2&gt;内容列表&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#syntax&quot;&gt;语法&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#type&quot;&gt;类型&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#function&quot;&gt;函数&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#module&quot;&gt;模块&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#object-oriented&quot;&gt;面向对象编程&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#resource&quot;&gt;资源&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;h2&gt;语法&lt;/h2&gt;
+
+&lt;h3&gt;声明变量&lt;/h3&gt;
+
+&lt;p&gt;在Python中声明一个变量非常简单。跟Javascript一样，你声明的时候也不用设置变量类型。还有你不用设置变量的作用域：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;x = 5
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;你可以改变变量的类型，只要给它赋值一个不同类型的值&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;x = 5       # x has a type of Integer
+x = ‘Hewwo’ # x is now a String
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;不像JavaScript，Python的变量一般都是块级作用域。&lt;/p&gt;
+
+&lt;h3&gt;块级作用域&lt;/h3&gt;
+
+&lt;p&gt;Python在不同于JavaScript，在语法上有点更严格。如果缩进少了一个空格都可以让程序跑不起来。这是因为Python是用缩进来创建块级作用域的。例如下面是JavaScript和Python创建作用域的比较：&lt;/p&gt;
+
+&lt;h3&gt;Creating a block in JavaScript &lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;
+function exampleFunction () {
+  // This is a block
+  var a = 5;
+}
+
+{
+  // This is also a block
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;Creating a block in Python &lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;
+# This is a block with its own scope
+
+def example_function():
+  # This is also a block with its own scope
+  x = 5
+  print(x)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;如果包含了&lt;code&gt;print(x)&lt;/code&gt;的一行代码有一个或者更多额外的空格，Python解释器就会报&lt;code&gt;IndentationError&lt;/code&gt;错误。因为这些额外的空格会创建一个非法的作用域。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+def example_function():
+  x = 5
+
+  # IndentationError!
+    print(x)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;如果这一行代码缺少一个或者更多空格，像这样：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+def example_function():
+  x = 5
+ print(x)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Python解释器会报错：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+NameError: name &#39;x&#39; is not defined
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;因为&lt;code&gt;print(x)&lt;/code&gt;中的x是在声明x的作用域之外的作用域。&lt;/p&gt;
+
+&lt;h3&gt;流程控制&lt;/h3&gt;
+
+&lt;p&gt;Python的if…else，while和for和JavaScript非常相似：&lt;/p&gt;
+
+&lt;h4&gt;if…else&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;
+if x &amp;gt; 2:
+  print(&#39;hai!&#39;)
+elif x &amp;gt; 3:
+  print(&#39;bye!&#39;)
+else:
+  print(&#39;hey now&#39;)
+
+if not x:
+  print(&#39;x is falsy!&#39;)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4&gt;while循环&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;
+while x &amp;gt; 0:
+  print(&#39;hey now&#39;)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4&gt;for循环&lt;/h4&gt;
+&lt;p&gt;和JavaScript的&lt;code&gt;foreach&lt;/code&gt;类似：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+ex_list = [1, 2, 3]
+
+for x in ex_list:
+  print(x)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;type&quot;&gt;类型&lt;/h2&gt;
+
+&lt;p&gt;Python的类型和JavaScript的类型很相似，所以就不像其他例如Java喝C#之类的语言严格&lt;/p&gt;
+
+&lt;p&gt;实际上变量有类型，但是你不用像java之类的静态类型语言去声明变量类型。&lt;/p&gt;
+
+&lt;p&gt;下面是一个Python数据类型的概览：&lt;/p&gt;
+
+&lt;h3&gt;Numbers&lt;/h3&gt;
+
+&lt;p&gt;和JavaScript不同，Python不止有一种number类型：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Integers:1,2,3&lt;/li&gt;
+  &lt;li&gt;Floats:4.20,4e520&lt;/li&gt;
+  &lt;li&gt;Complex numbers:4 ＋ 20j&lt;/li&gt;
+  &lt;li&gt;Booleans:True,False&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;用Python你可以像JavaScript一样进行numbers的运算。还有一个求幂运算符（**）&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+# a = 4
+a = 2 ** 2
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;Lists&lt;/h3&gt;
+
+&lt;p&gt;Lists和JavaScript中的arrays类似，Lists可以包含不同的类型：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+[4, &quot;2&quot;, [0, &quot;zero&quot;]]
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;还有特殊的语法可以取子元素&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+a_list = [1, 2, 3, 4, 5]
+
+# 1, 2, 3
+a_list[0:2]
+
+# 4, 5
+a_list[3:]
+
+# 3, 4
+a_list[2, -2]
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;和一些内置方法：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+# 3
+len([1, 2, 3])
+
+# 3, 2, 1
+[1, 2, 3].reverse()
+
+# 1, 2, 3
+[1, 2].append(3)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;你深知可以用＋号来连接两个lists：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+# 1, 2, 3, 4
+[1, 2] + [3, 4]
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;String&lt;/h3&gt;
+
+&lt;p&gt;Python的Strings和JavaScript的很像，他们也是不可变的，而且独立的自负可以像数组子元素那样被获取到：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+name = &#39;Mario&#39;
+
+# M
+print(name[0])
+
+# Nope, name is still &#39;Mario&#39;
+name[0] = &#39;W&#39;
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;Dictionaries&lt;/h3&gt;
+
+&lt;p&gt;Dictionaries是组合的arrays，类似JavaScript的objects。实际上，dictionaries可以用类似json语法来声明：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+# Dictionaries in python
+person = {
+  &#39;name&#39;: &#39;Mario&#39;,
+  &#39;age&#39;: 24
+}
+
+# Mario
+print(person[&#39;name&#39;])
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Dictionaries有一个便利的方法，当获取一个不存在的key的value时，可以返回一个默认值：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+# Because `gender` is not defined, non-binary will be returned
+person.get(&#39;gender&#39;, &#39;non-binary&#39;)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;None&lt;/h3&gt;
+
+&lt;p&gt;None等于JavaScript的null。它表示一个值的缺失，并且可以表示false&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+x = None
+
+if not x:
+  print(&#39;x is falsy!&#39;)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;function&quot;&gt;函数&lt;/h2&gt;
+
+&lt;p&gt;跟JavaScript一样，Python的函数是对象。这意味着你可以将函数当作参数，或者给函数设置属性：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+def func(a, fn):
+  print(a)
+  fn()
+
+func.x = &#39;meep&#39;
+
+# &#39;meep&#39;
+print(func.x)
+
+def another_func():
+  print(&#39;hey&#39;)
+
+# 5
+# &#39;hey&#39;
+func(5, another_func)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;module&quot;&gt;模块&lt;/h2&gt;
+
+&lt;p&gt;Python的模块跟ES6的模块不会相差很多&lt;/p&gt;
+
+&lt;h3&gt;定义一个模块&lt;/h3&gt;
+
+&lt;p&gt;Python的模块就是一个包含Python代码的文件&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+# my_module.py
+hey = &#39;heyyy&#39;
+
+def say_hey():
+  print(hey)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;不像JavaScript，你不用声明要暴露什么，默认所有东西都会被暴露出去&lt;/p&gt;
+
+&lt;h3&gt;引入一个模块&lt;/h3&gt;
+
+&lt;p&gt;你可以引入Python的整一个模块：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+# importing my_module.py from another_module.py; both files are in the same
+# directory
+import my_module
+
+# Do things
+my_module.say_hey()
+print(my_module.hey)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;或者从一个模块引入单独项：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+# another_module.py
+from my_module import hey, say_hey
+
+# Do things
+say_hey()
+print(hey)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;你也可以从&lt;a href=&quot;https://pypi.python.org/pypi/pip&quot;&gt;pip&lt;/a&gt;安装别人写的模块，pip是一个Python的包管理器&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+pip install simplejson
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;object-oriented&quot;&gt;面向对象编程&lt;/h2&gt;
+
+&lt;p&gt;Python支持面向对象编程，而且不像JavaScript的原型继承，它支持class和传统的继承。&lt;/p&gt;
+
+&lt;h3&gt;类&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;
+# Defining a class
+class Animal:
+  # Variable that is shared by all instances of the Animal class
+  default_age = 1
+
+  # Constructor
+  def __init__(self, name):
+    # Defining a publicly available variable
+    self.name = name
+
+    # You can define private variables and methods by prepending the variable
+    # name with 2 underscores (__):
+    self.__age = default_age
+
+  # Public method
+  def get_age(self):
+    return self.__age
+
+  # Private method
+  def __meow():
+    print(&#39;meowwww&#39;)
+
+  # Defining a static method with the `staticmethod` decorator
+  @staticmethod
+  def moo():
+    print(&#39;moooo&#39;)
+
+# Creating an Animal object
+animal = Animal()
+
+# Accessing public variables and methods
+print(animal.name)
+print(animal.default_age)
+print(animal.get_age())
+
+# Accessing a static method
+Animal.moo()
+
+# ERR!!!! .__age is private, so this won&#39;t work:
+print(animal.__age)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;继承&lt;/h3&gt;
+
+&lt;p&gt;class可以继承其他class：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+# Inheriting from the Animal class
+class Human(Animal):
+  def __init__(self, name, ssn):
+    # Must call the __init__ method of the base class
+    super().__init__(name)
+    self.__ssn = ssn
+
+  def get_ssn(self):
+    return self.__ssn
+
+# Using the Human class
+human = Human(&#39;Mario&#39;, 123456789)
+
+# Human objects have access to methods defined in the Animal base class
+human.get_age()
+human.get_ssn()
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;resource&quot;&gt;资源&lt;/h2&gt;
+
+&lt;p&gt;除了这篇指南之外，Python还有许多内容，我强烈建议你去看一下&lt;a href=&quot;https://docs.python.org/3/&quot;&gt;Python docs&lt;/a&gt;，里面有教程和一些详细的语言特性。&lt;/p&gt;
+
+&lt;p&gt;还有记得学习一门语言最好的方法就是去写，要写很多。所以开始编码吧！&lt;/p&gt;
+
+&lt;p&gt;P.S:如果你对新建一个项目需要什么建议，或许可以试一下用&lt;a href=&quot;http://flask.pocoo.org/&quot;&gt;Flask&lt;/a&gt;创建一个简单的API？&lt;/p&gt;
+</description>
+        <pubDate>Thu, 17 Nov 2016 00:00:00 +0800</pubDate>
+      </item>
     
       <item>
         <title>前端开发中如何优雅地模拟数据</title>
